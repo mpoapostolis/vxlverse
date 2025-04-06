@@ -15,6 +15,7 @@ import {
   Expand,
   Undo,
   Redo,
+  Image,
 } from "lucide-react";
 import { Tooltip } from "../UI/Tooltip";
 import { useEditorStore } from "../../stores/editorStore";
@@ -22,11 +23,13 @@ import { useKeyboardControls } from "@react-three/drei";
 import { cn } from "../UI";
 
 type ToolbarProps = {
+  mode?: "gallery" | "editor";
   setShowMetrics: (show: boolean | ((s: boolean) => boolean)) => void;
   showMetrics: boolean;
   setTransformMode: (mode: "translate" | "rotate" | "scale") => void;
 };
 export const Toolbar: React.FC<ToolbarProps> = ({
+  mode,
   setShowMetrics,
   setTransformMode,
   showMetrics,
@@ -117,6 +120,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     const unsubscribeBrush = subscribeKeys(
       (state) => state.brush,
       (pressed) => {
+        if (mode === "gallery" && pressed) {
+          toggleBrushMode(pressed);
+        }
         if (pressed && selectedObjectId) {
           setActiveTool("brush");
           toggleBrushMode(pressed);
@@ -225,6 +231,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       unsubscribeAddObject();
     };
   }, [
+    mode,
     selectedObjectId,
     currentSceneId,
     subscribeKeys,
@@ -324,19 +331,35 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <Copy className="w-4 h-4" />
         </button>
       </Tooltip>
-      <Tooltip position="right" content="Brush Tool (B)">
-        <button
-          disabled={!selectedObjectId}
-          onClick={handleBrushToggle}
-          className={`w-10 h-10 flex items-center justify-center transition-all duration-200 ${
-            brushActive
-              ? "bg-gradient-to-b from-blue-600/30 to-blue-500/20 text-blue-300 border-l-2 border-blue-400 shadow-[0_2px_4px_rgba(59,130,246,0.2)]"
-              : "text-slate-400 hover:bg-slate-700/40 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400"
-          }`}
-        >
-          <Brush className="w-4 h-4" />
-        </button>
-      </Tooltip>
+      {mode === "editor" && (
+        <Tooltip position="right" content="Brush Tool (B)">
+          <button
+            disabled={!selectedObjectId}
+            onClick={handleBrushToggle}
+            className={`w-10 h-10 flex items-center justify-center transition-all duration-200 ${
+              brushActive
+                ? "bg-gradient-to-b from-blue-600/30 to-blue-500/20 text-blue-300 border-l-2 border-blue-400 shadow-[0_2px_4px_rgba(59,130,246,0.2)]"
+                : "text-slate-400 hover:bg-slate-700/40 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400"
+            }`}
+          >
+            <Brush className="w-4 h-4" />
+          </button>
+        </Tooltip>
+      )}
+      {mode === "gallery" && (
+        <Tooltip position="right" content="Brush Tool (B)">
+          <button
+            onClick={handleBrushToggle}
+            className={`w-10 h-10 flex items-center justify-center transition-all duration-200 ${
+              brushActive
+                ? "bg-gradient-to-b from-blue-600/30 to-blue-500/20 text-blue-300 border-l-2 border-blue-400 shadow-[0_2px_4px_rgba(59,130,246,0.2)]"
+                : "text-slate-400 hover:bg-slate-700/40 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400"
+            }`}
+          >
+            <Image className="w-4 h-4" />
+          </button>
+        </Tooltip>
+      )}
       <Tooltip position="right" content="Delete Object (Delete)">
         <button
           disabled={!selectedObjectId}

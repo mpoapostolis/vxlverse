@@ -114,6 +114,7 @@ export function _ArtGallery() {
         <div className="toolbar flex">
           {/* Show PaintingToolbar when a painting is selected, otherwise show regular Toolbar */}
           <Toolbar
+            mode="gallery"
             setTransformMode={setTransformMode}
             setShowMetrics={setShowMetrics}
             showMetrics={showMetrics}

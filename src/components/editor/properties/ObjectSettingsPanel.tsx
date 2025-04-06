@@ -1,14 +1,30 @@
 import { useState } from "react";
-import { Settings, Minimize, Maximize, Edit3, Check, Tag, MessageSquare } from "lucide-react";
+import {
+  Settings,
+  Minimize,
+  Maximize,
+  Edit3,
+  Check,
+  Tag,
+  MessageSquare,
+  Image,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { useEditorStore } from "../../../stores/editorStore";
 import { Input } from "../../UI/input";
 import { Select } from "../../UI/select";
 import { Textarea } from "../../UI";
 import { GameObject } from "../../../types";
+import { useGallery } from "../../../hooks/useGallery";
 
 export function ObjectSettingsPanel() {
   const [expanded, setExpanded] = useState(true);
   const [showSaveIndicator, setShowSaveIndicator] = useState(false);
+  const [showImageSelector, setShowImageSelector] = useState(false);
+
+  // Get gallery images
+  const { images, isLoading } = useGallery();
 
   // Get data from the editor store
   const currentSceneId = useEditorStore((state) => state.currentSceneId);
@@ -137,6 +153,130 @@ export function ObjectSettingsPanel() {
                       placeholder="Describe your character, for example, you are a friendly merchant known for your warm smile and eagerness to help travelers."
                     />
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Painting Image Selector - only show for paintings */}
+            {selectedObject.type === "painting" && (
+              <div className="mt-3 ">
+                <div className="gap-2">
+                  <div className="flex  gap-4">
+                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-blue-400/10 border border-blue-500/30">
+                      <Image className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div className="flex-grow">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-xs font-medium text-slate-200">Painting Image</h3>
+                        <button
+                          onClick={() => setShowImageSelector(!showImageSelector)}
+                          className="text-xs flex items-center px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-slate-200 transition-all duration-200 border border-slate-700"
+                        >
+                          {showImageSelector ? (
+                            <>
+                              <span className="mr-1">Hide Gallery</span>
+                              <ChevronUp className="w-3 h-3" />
+                            </>
+                          ) : (
+                            <>
+                              <span className="mr-1">Browse Gallery</span>
+                              <ChevronDown className="w-3 h-3" />
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Current image preview */}
+                  <div className="bg-slate-800/90 border border-slate-700 rounded overflow-hidden mb-2">
+                    <div className="aspect-video relative overflow-hidden bg-slate-900/80">
+                      <img
+                        src={selectedObject.imageUrl || "/textures/canvas.png"}
+                        alt="Current painting"
+                        className="w-full h-full object-scale-down"
+                      />
+                    </div>
+                    <div className="px-2 py-1.5 text-xs text-slate-400 truncate flex items-center justify-between border-t border-slate-700/50">
+                      <div className="flex items-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></div>
+                        {selectedObject.imageUrl
+                          ? selectedObject.imageUrl.split("/").pop()
+                          : "Default Canvas"}
+                      </div>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+                        {selectedObject.imageUrl ? "Custom" : "Default"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Image Gallery Selector */}
+                  {showImageSelector && (
+                    <div className="rounded overflow-hidden border border-slate-700 bg-slate-800/90 mb-2 transition-all duration-200">
+                      <div className="px-2 py-1.5 border-b border-slate-700 flex justify-between items-center sticky top-0 bg-slate-800 z-10">
+                        <span className="text-xs font-medium text-slate-300">Gallery Images</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+                          {images.length} images
+                        </span>
+                      </div>
+
+                      <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                        {isLoading ? (
+                          <div className="p-4 text-center">
+                            <div className="w-5 h-5 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
+                            <p className="text-xs text-slate-400">Loading gallery images...</p>
+                          </div>
+                        ) : images.length === 0 ? (
+                          <div className="p-4 text-center">
+                            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-2 border border-slate-700">
+                              <Image className="w-4 h-4 text-slate-500" />
+                            </div>
+                            <p className="text-xs text-slate-400">No images in gallery</p>
+                            <p className="text-[10px] text-slate-500">
+                              Upload some in the Library tab
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-3 gap-1.5 p-1.5">
+                            {images.map((image) => (
+                              <div
+                                key={image.id}
+                                onClick={() => {
+                                  if (currentSceneId && selectedObjectId) {
+                                    updateObject(currentSceneId, selectedObjectId, {
+                                      imageUrl: image.imageUrl,
+                                    });
+                                    showSaveAnimation();
+                                  }
+                                }}
+                                className={`group cursor-pointer overflow-hidden transition-all duration-200 ${
+                                  selectedObject.imageUrl === image.imageUrl
+                                    ? "ring-2 ring-blue-500 shadow-md"
+                                    : "border border-slate-700 hover:border-blue-500/50"
+                                }`}
+                              >
+                                <div className="aspect-video overflow-hidden relative bg-slate-900/80">
+                                  <img
+                                    src={image.imageUrl}
+                                    alt="Gallery image"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    loading="lazy"
+                                  />
+                                  {selectedObject.imageUrl === image.imageUrl && (
+                                    <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+                                      <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <Check className="w-3 h-3 text-white" />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

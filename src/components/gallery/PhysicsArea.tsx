@@ -92,17 +92,10 @@ export function PhysicsArea() {
     }
   };
 
-  const selectedPainting = useMemo(() => {
-    if (!selectedObjectId) return null;
-    const currObj = scenes
-      ?.find((s) => s.id === currentSceneId)
-      ?.objects?.find((o) => o.id === selectedObjectId);
-    return currObj;
-  }, [scenes, selectedObjectId, currentSceneId]);
-
   const addPainting = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
-    if (!selectedObjectId) return;
+    if (!paintingRef.current) return;
+    if (!brushActive) return;
 
     const id = new THREE.Object3D().uuid;
     const newPainting = {
@@ -120,7 +113,7 @@ export function PhysicsArea() {
 
   return (
     <>
-      {selectedPainting && brushActive && (
+      {brushActive && (
         <group ref={paintingRef}>
           <Paint />
         </group>
