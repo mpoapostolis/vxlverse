@@ -27,7 +27,7 @@ interface GameCardProps {
 const DEFAULT_THUMBNAIL =
   "https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80";
 
-export const GameCard = memo(function GameCard({ game, index, onDelete }: GameCardProps) {
+export const GameCard = memo(function GameCard({ game, index = 0, onDelete }: GameCardProps) {
   const { user } = useAuthStore();
   const isOwner = user?.id === game.owner;
   const [isLiked, setIsLiked] = useState(false);
@@ -48,11 +48,11 @@ export const GameCard = memo(function GameCard({ game, index, onDelete }: GameCa
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group relative h-[20rem]  overflow-hidden backdrop-blur-sm bg-gradient-to-br from-gray-800/30 via-gray-900/30 to-black/30 border border-gray-700/30 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 flex flex-col"
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className="group relative h-[22rem] rounded-xl overflow-hidden bg-gray-900 border border-white/5 hover:border-blue-500/30 shadow-lg hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col"
     >
-      {/* Thumbnail with glass effect */}
-      <div className="relative h-48 overflow-hidden" style={{ backgroundColor: placeholderColor }}>
+      {/* Thumbnail */}
+      <div className="relative h-44 overflow-hidden" style={{ backgroundColor: placeholderColor }}>
         <img
           src={
             game.thumbnail
@@ -66,13 +66,16 @@ export const GameCard = memo(function GameCard({ game, index, onDelete }: GameCa
           onLoad={() => setImageLoaded(true)}
           className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-70" />
 
         {/* Play button overlay */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Link to={`/play/${game.id}`}>
-            <div className="bg-blue-500 p-3  shadow-lg shadow-blue-500/25 backdrop-blur-sm">
-              <PlayCircle className="w-6 h-6 text-white" />
+            <div className="relative">
+              <div className="absolute -inset-1 bg-blue-500 rounded-full opacity-70 blur-md"></div>
+              <div className="relative bg-blue-600 p-3 rounded-full shadow-lg shadow-blue-500/40">
+                <PlayCircle className="w-6 h-6 text-white" />
+              </div>
             </div>
           </Link>
         </div>
@@ -80,55 +83,51 @@ export const GameCard = memo(function GameCard({ game, index, onDelete }: GameCa
         {/* Like button */}
         <button
           onClick={() => setIsLiked(!isLiked)}
-          className="absolute top-2 right-2 p-1.5  backdrop-blur-sm bg-white/10 border border-white/20 shadow-xl"
+          className="absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm bg-black/30 border border-white/10 shadow-lg hover:bg-black/50 transition-all duration-200"
         >
           <Heart
-            className={`w-3.5 h-3.5 transition-colors ${
+            className={`w-4 h-4 transition-colors ${
               isLiked ? "text-red-500 fill-red-500" : "text-white"
             }`}
           />
         </button>
       </div>
 
-      {/* Content with glass effect */}
-      <div className="relative flex-1 p-4 flex flex-col">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/10 pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-blue-500/20 blur-3xl pointer-events-none" />
-
+      {/* Content */}
+      <div className="relative flex-1 p-5 flex flex-col">
         {/* Title and Actions */}
-        <div className="relative flex items-start justify-between gap-2 mb-2">
-          <h3 className="text-base font-bold truncate">{game.title}</h3>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="text-base font-semibold text-white truncate">{game.title}</h3>
           {isOwner && (
             <div className="flex gap-1 flex-shrink-0">
               <Link
                 to={`/editor/${game.id}`}
-                className="p-1 text-gray-400 hover:text-white hover:bg-white/10  backdrop-blur-sm transition-all duration-300"
+                className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
               >
-                <Edit3 className="w-3 h-3" />
+                <Edit3 className="w-3.5 h-3.5" />
               </Link>
               <button
                 onClick={handleDelete}
-                className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-500/10  backdrop-blur-sm transition-all duration-300"
+                className="p-1.5 rounded-full text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
         </div>
 
         {/* Description */}
-        <p className="relative text-gray-300 text-xs line-clamp-2 leading-relaxed mb-2">
+        <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
           {game.description || "No description available"}
         </p>
 
         {/* Tags */}
         {game.tags && game.tags.length > 0 && (
-          <div className="relative flex flex-wrap gap-1 mb-2 max-h-12 overflow-y-auto">
+          <div className="flex flex-wrap gap-1.5 mb-4 max-h-12 overflow-y-auto">
             {game.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-1.5 py-0.5 text-[10px] font-medium text-blue-300 bg-blue-500/10  border border-blue-500/20 backdrop-blur-sm whitespace-nowrap"
+                className="px-2 py-0.5 text-[10px] font-medium text-blue-300 bg-blue-500/10 rounded-full border border-blue-500/20 whitespace-nowrap"
               >
                 {tag}
               </span>
@@ -136,28 +135,35 @@ export const GameCard = memo(function GameCard({ game, index, onDelete }: GameCa
           </div>
         )}
 
-        {/* Stats with glass effect */}
-        <div className="relative flex items-center gap-3 text-[10px] mt-auto">
-          <div className="flex items-center gap-1">
-            <div className="p-1  bg-yellow-500/10 backdrop-blur-sm">
-              <Star className="w-3 h-3 text-yellow-500" />
+        {/* Stats */}
+        <div className="flex items-center justify-between text-xs mt-auto pt-3 border-t border-gray-800/50">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="p-1.5 rounded-full bg-yellow-500/10">
+                <Star className="w-3.5 h-3.5 text-yellow-400" />
+              </div>
+              <span className="text-yellow-400 font-medium">
+                {game.rating?.toFixed(1) || "4.5"}
+              </span>
             </div>
-            <span className="text-yellow-500 font-medium">{game.rating?.toFixed(1) || "4.5"}</span>
+            <div className="flex items-center gap-1.5">
+              <div className="p-1.5 rounded-full bg-blue-500/10">
+                <Users className="w-3.5 h-3.5 text-blue-400" />
+              </div>
+              <span className="text-blue-400 font-medium">{game.players || "128"}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="p-1  bg-blue-500/10 backdrop-blur-sm">
-              <Users className="w-3 h-3 text-blue-400" />
+          <div className="flex items-center gap-1.5">
+            <div className="p-1.5 rounded-full bg-violet-500/10">
+              <Clock className="w-3.5 h-3.5 text-violet-400" />
             </div>
-            <span className="text-blue-400 font-medium">{game.players || "128"}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="p-1  bg-purple-500/10 backdrop-blur-sm">
-              <Clock className="w-3 h-3 text-purple-400" />
-            </div>
-            <span className="text-purple-400 font-medium">
+            <span className="text-violet-400 font-medium">
               {game.updated
-                ? new Date(game.updated).toLocaleDateString()
-                : new Date().toLocaleDateString()}
+                ? new Date(game.updated).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })
+                : new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })}
             </span>
           </div>
         </div>

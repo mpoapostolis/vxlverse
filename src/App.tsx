@@ -27,12 +27,8 @@ const ArtGallery = lazy(() =>
 const Galleries = lazy(() =>
   import("./pages/Galleries").then((module) => ({ default: module.Galleries }))
 );
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center h-screen w-screen">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
+const Pricing = lazy(() =>
+  import("./pages/Pricing").then((module) => ({ default: module.Pricing }))
 );
 
 export default function App() {
@@ -46,6 +42,7 @@ export default function App() {
           <Route path="/gallery" element={<Galleries />} />
           <Route path="/gallery/:id" element={<ArtGallery />} />
           <Route path="/gallery/:id/edit" element={<ArtGallery />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/editor/demo" element={<Editor />} />
 

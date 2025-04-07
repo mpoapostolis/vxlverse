@@ -32,20 +32,20 @@ function GalleryShowcase() {
     {
       title: "Abstract Dimensions",
       image:
-        "https://images.unsplash.com/photo-1633177317976-3f9bc45e1d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1633177317976-3f9bc45e1d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=70",
       description:
         "A mesmerizing collection of abstract 3D sculptures exploring dimensions and space",
     },
     {
       title: "Neon Dreams",
       image:
-        "https://images.unsplash.com/photo-1633193330105-cc49d5e64fca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1633193330105-cc49d5e64fca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=70",
       description: "Vibrant neon-inspired 3D artwork that brings cyberpunk aesthetics to life",
     },
     {
       title: "Nature Reimagined",
       image:
-        "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=70",
       description: "Organic 3D forms and structures inspired by natural patterns and growth",
     },
   ];
@@ -111,7 +111,6 @@ function GalleryShowcase() {
           initial={{ opacity: 0 }}
           animate={{
             opacity: currentSlide === index ? 1 : 0,
-            scale: currentSlide === index ? 1 : 1.1,
           }}
           transition={{ duration: 0.7 }}
           className={`absolute inset-0 ${currentSlide === index ? "z-10" : "z-0"}`}
@@ -123,17 +122,18 @@ function GalleryShowcase() {
             loading="lazy"
             width="800"
             height="600"
+            decoding="async"
+            fetchPriority="low"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
 
           {/* Gallery info */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0 }}
             animate={{
               opacity: currentSlide === index ? 1 : 0,
-              y: currentSlide === index ? 0 : 20,
             }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.3 }}
             className="absolute bottom-0 left-0 right-0 p-8 z-20"
           >
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 text-white">
@@ -211,16 +211,7 @@ export function Home() {
 
   const { user } = useAuthStore();
 
-  // Add scroll animation effect for elements
-  useEffect(() => {
-    const handleScroll = () => {
-      // This could be used for future scroll animations
-      // Currently just setting up the listener for future use
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // We don't need the scroll listener yet, so removing it for better performance
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
@@ -582,7 +573,7 @@ export function Home() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: Math.min(index * 0.1, 0.3) }}
-                className="group relative h-[20rem] overflow-hidden backdrop-blur-sm bg-gradient-to-br from-gray-800/30 via-gray-900/30 to-black/30 border border-gray-700/30 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 flex flex-col"
+                className="group relative h-[20rem] overflow-hidden backdrop-blur-sm bg-gradient-to-br from-gray-800/30 via-gray-900/30 to-black/30 border border-gray-700/30 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-colors duration-300 flex flex-col"
               >
                 {/* Thumbnail */}
                 <div
@@ -592,10 +583,12 @@ export function Home() {
                   <img
                     src={game.image}
                     alt={game.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
                     width="400"
                     height="300"
+                    decoding="async"
+                    fetchPriority="low"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
 
@@ -781,7 +774,7 @@ const featuredGames = [
     title: "Voxel Adventure",
     description: "Explore a vast voxel world filled with treasures and dangers",
     image:
-      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=70",
     color: "#3b82f6",
     rating: "4.8",
     players: "2.3k",
@@ -791,7 +784,7 @@ const featuredGames = [
     title: "Cube Racer",
     description: "Race through challenging tracks in this high-speed voxel racing game",
     image:
-      "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=70",
     color: "#8b5cf6",
     rating: "4.5",
     players: "1.8k",
@@ -801,7 +794,7 @@ const featuredGames = [
     title: "Block Battles",
     description: "Strategic multiplayer battles in a destructible voxel environment",
     image:
-      "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=70",
     color: "#ec4899",
     rating: "4.7",
     players: "3.1k",
