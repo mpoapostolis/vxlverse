@@ -17,6 +17,8 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  Construction,
+  Clock,
 } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 import "../styles/animations.css";
@@ -231,6 +233,14 @@ export function Home() {
       </Helmet>
       <Header />
 
+      {/* Under Development Banner */}
+      <div className="fixed top-30 -right-10 z-30 w-96 transform rotate-45 translate-x-12 translate-y-10">
+        <div className="bg-yellow-500 py-2 text-black font-bold px-16 shadow-lg flex items-center gap-2">
+          <Construction className="w-4 h-4" />
+          <span>UNDER DEVELOPMENT</span>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         {/* Background Elements */}
@@ -249,6 +259,10 @@ export function Home() {
           >
             <div className="inline-block mb-6 px-4 py-1 bg-gradient-to-r from-violet-500/20 to-blue-500/20 backdrop-blur-sm border border-violet-500/30 text-violet-300 text-sm font-medium">
               The easiest way to create 3D games and art galleries
+              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500 text-white">
+                <Clock className="w-3 h-3 mr-1" />
+                Coming Soon
+              </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-blue-400 to-indigo-400">
               <span className="sr-only">VXLVerse - </span>Create, Share, and Play 3D Experiences
@@ -454,6 +468,10 @@ export function Home() {
                 id="galleries"
               >
                 Stunning 3D Art Galleries
+                <div className="inline-block ml-3 px-2 py-1 bg-yellow-500/90 text-black text-xs font-bold rounded-md">
+                  <Construction className="w-3 h-3 inline mr-1" />
+                  COMING SOON
+                </div>
               </h2>
               <p className="text-gray-400 max-w-2xl mx-auto">
                 Create, curate, and showcase your 3D artwork in immersive virtual galleries
@@ -543,6 +561,10 @@ export function Home() {
               id="games"
             >
               Featured Games
+              <div className="inline-block ml-3 px-2 py-1 bg-yellow-500/90 text-black text-xs font-bold rounded-md">
+                <Construction className="w-3 h-3 inline mr-1" />
+                COMING SOON
+              </div>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Check out these amazing games created with VXLVerse
@@ -655,6 +677,10 @@ export function Home() {
                 id="get-started"
               >
                 Ready to Create Your Own 3D Experience?
+                <div className="inline-block ml-3 px-2 py-1 bg-yellow-500/90 text-black text-xs font-bold rounded-md">
+                  <Clock className="w-3 h-3 inline mr-1" />
+                  LAUNCHING SOON
+                </div>
               </h2>
               <p className="text-lg text-gray-300 mb-4 max-w-2xl mx-auto">
                 Join thousands of creators building amazing games and experiences on VXLVerse
