@@ -191,7 +191,7 @@ export function Header() {
                             </div>
                             <div>
                               <p className="text-sm font-medium text-white truncate">
-                                {user.name || "User"}
+                                {user.email || "User"}
                               </p>
                               <p className="text-xs text-gray-400 truncate">{user.email}</p>
                               <div className="mt-1.5 text-xs bg-gradient-to-r from-blue-500/20 to-violet-500/20 text-blue-300 px-2 py-0.5 rounded-full inline-block border border-blue-500/20">
