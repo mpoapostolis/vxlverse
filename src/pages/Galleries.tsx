@@ -46,14 +46,6 @@ export function Galleries() {
     return filtered;
   }, [galleries, search, selectedTags, activeTab, user?.id]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-900">
       <Header />
@@ -144,7 +136,7 @@ export function Galleries() {
         </div>
 
         {/* Empty State */}
-        {filteredGalleries.length === 0 && (
+        {!isLoading && filteredGalleries.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-gray-400 mb-4">No galleries found</p>
             {user && (
@@ -162,14 +154,20 @@ export function Galleries() {
       </div>
 
       {/* Create Gallery Modal */}
-      <CreateGalleryModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={() => {
-          setIsCreateModalOpen(false);
-          mutate();
-        }}
-      />
+      {isLoading ? (
+        <div className="flex items-center justify-center ">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent animate-spin" />
+        </div>
+      ) : (
+        <CreateGalleryModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => {
+            setIsCreateModalOpen(false);
+            mutate();
+          }}
+        />
+      )}
     </div>
   );
 }
