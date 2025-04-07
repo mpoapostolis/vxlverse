@@ -1,482 +1,775 @@
-import { useState, useEffect } from "react";
-import { CreateGameModal } from "../components/game/CreateGameModal";
-import { useAuthStore } from "../stores/authStore";
-import { Hero } from "../components/home/Hero";
-import { Features } from "../components/home/Features";
-import { HowItWorks } from "../components/home/HowItWorks";
+import { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
-import { Gamepad2, ArrowRight, Image, Paintbrush } from "lucide-react";
+import {
+  ArrowRight,
+  Box,
+  Gamepad2,
+  Palette,
+  Users,
+  Zap,
+  Star,
+  Trophy,
+  Image,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { useAuthStore } from "../stores/authStore";
 import "../styles/animations.css";
-import { Link } from "react-router-dom";
-import { useGames } from "../hooks/useGames";
-import { GameCard } from "../components/game/GameCard";
-import { useGalleries } from "../hooks/useGalleries";
-import { SEO } from "../components/shared/SEO";
 
-export function Home() {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const { isAuthenticated } = useAuthStore();
-  const { games } = useGames();
-  const { galleries } = useGalleries();
-  useEffect(() => {
-    // Event listener for opening the create game modal from other components
-    const handleOpenCreateModal = () => {
-      if (isAuthenticated) {
-        setShowCreateModal(true);
+// Gallery Showcase Component
+function GalleryShowcase() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  const galleries = [
+    {
+      title: "Abstract Dimensions",
+      image:
+        "https://images.unsplash.com/photo-1633177317976-3f9bc45e1d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      description:
+        "A mesmerizing collection of abstract 3D sculptures exploring dimensions and space",
+    },
+    {
+      title: "Neon Dreams",
+      image:
+        "https://images.unsplash.com/photo-1633193330105-cc49d5e64fca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      description: "Vibrant neon-inspired 3D artwork that brings cyberpunk aesthetics to life",
+    },
+    {
+      title: "Nature Reimagined",
+      image:
+        "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      description: "Organic 3D forms and structures inspired by natural patterns and growth",
+    },
+  ];
+
+  // Pause autoplay when user interacts with gallery
+  const handleManualNavigation = useCallback((action: () => void) => {
+    setIsAutoPlaying(false);
+    action();
+
+    // Resume autoplay after 10 seconds of inactivity
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  }, []);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev === galleries.length - 1 ? 0 : prev + 1));
+  }, [galleries.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev === 0 ? galleries.length - 1 : prev - 1));
+  }, [galleries.length]);
+
+  // For better accessibility
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        handleManualNavigation(prevSlide);
+      } else if (e.key === "ArrowRight") {
+        handleManualNavigation(nextSlide);
       }
-    };
+    },
+    [handleManualNavigation, prevSlide, nextSlide]
+  );
 
-    window.addEventListener("open-create-game-modal", handleOpenCreateModal);
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
 
-    // Cleanup event listener
+    if (isAutoPlaying) {
+      interval = setInterval(() => {
+        nextSlide();
+      }, 5000);
+    }
+
     return () => {
-      window.removeEventListener("open-create-game-modal", handleOpenCreateModal);
+      if (interval) clearInterval(interval);
     };
-  }, [isAuthenticated]);
+  }, [isAutoPlaying, nextSlide]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black overflow-hidden">
-      <SEO
-        title="VXLVerse - Create 3D Games & Art Galleries"
-        description="Build incredible 3D games and stunning virtual art galleries with VXLVerse. No coding required, multiple pricing options available. Start your creative journey today."
-        keywords="3D games, art gallery, virtual gallery, game creation, 3D modeling, no-code, game engine, virtual exhibition, online gallery, 3D art"
-        ogImage="/vxlverse-social-preview.jpg"
-      />
-      {/* Background effects */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.15),transparent_50%)] pointer-events-none z-0" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.1),transparent_70%)] pointer-events-none z-0" />
-      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-[0.03] pointer-events-none z-0" />
+    <div
+      className="relative h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] w-full overflow-hidden rounded-lg border border-purple-500/30 shadow-2xl shadow-purple-500/20"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="region"
+      aria-label="Gallery showcase"
+    >
+      {/* Background glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-blue-500/10 z-0"></div>
 
-      <Header />
-
-      {/* Under Construction Badge */}
-      <div className="fixed top-20 right-4 z-30 bg-yellow-600 text-white px-4 py-2  shadow-lg transform rotate-3 border-2 border-yellow-400 flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
+      {/* Gallery images */}
+      {galleries.map((gallery, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: currentSlide === index ? 1 : 0,
+            scale: currentSlide === index ? 1 : 1.1,
+          }}
+          transition={{ duration: 0.7 }}
+          className={`absolute inset-0 ${currentSlide === index ? "z-10" : "z-0"}`}
         >
-          <path
-            fillRule="evenodd"
-            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-            clipRule="evenodd"
+          <img
+            src={gallery.image}
+            alt={gallery.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            width="800"
+            height="600"
           />
-        </svg>
-        <span className="font-bold">Under Development</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+
+          {/* Gallery info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{
+              opacity: currentSlide === index ? 1 : 0,
+              y: currentSlide === index ? 0 : 20,
+            }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="absolute bottom-0 left-0 right-0 p-8 z-20"
+          >
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 text-white">
+              {gallery.title}
+            </h3>
+            <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-2xl line-clamp-2 sm:line-clamp-none">
+              {gallery.description}
+            </p>
+            <Link
+              to="/gallery"
+              className="inline-flex items-center gap-1 sm:gap-2 mt-2 sm:mt-4 px-2 py-1 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white text-xs sm:text-sm font-medium transition-all duration-300"
+            >
+              View Gallery
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </motion.div>
+      ))}
+
+      {/* Navigation buttons */}
+      <button
+        onClick={() => handleManualNavigation(prevSlide)}
+        aria-label="Previous gallery"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-1 sm:p-2 bg-black/50 backdrop-blur-sm border border-white/10 hover:bg-black/70 text-white transition-colors duration-300"
+      >
+        <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
+      </button>
+      <button
+        onClick={() => handleManualNavigation(nextSlide)}
+        aria-label="Next gallery"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-1 sm:p-2 bg-black/50 backdrop-blur-sm border border-white/10 hover:bg-black/70 text-white transition-colors duration-300"
+      >
+        <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
+      </button>
+
+      {/* Indicators */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+        {galleries.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => handleManualNavigation(() => setCurrentSlide(index))}
+            aria-label={`View gallery ${index + 1}`}
+            aria-current={currentSlide === index ? "true" : "false"}
+            className={`w-2 h-2 rounded-full transition-colors duration-300 ${currentSlide === index ? "bg-white w-4" : "bg-white/50"}`}
+          />
+        ))}
       </div>
 
-      {/* Main Content */}
-      <main className="relative z-10">
-        <Hero />
-
-        {/* Create Section */}
-        <section className="py-20 relative overflow-hidden">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Create Your Vision</h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                VXLVerse gives you the power to build incredible interactive experiences without
-                coding. Choose your creative path and start building today.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {/* 3D Games Card */}
-              <Link to="/editor/demo">
-                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-blue-500/20  overflow-hidden group hover:border-blue-500/40 transition-all shadow-lg hover:shadow-blue-500/10">
-                  <div className="h-48 bg-gradient-to-br from-blue-900/30 to-blue-700/20 flex items-center justify-center">
-                    <Gamepad2 className="w-24 h-24 text-blue-400 opacity-75 group-hover:scale-110 transition-transform duration-300" />
-                  </div>
-                  <div className="p-8">
-                    <h3 className="text-2xl font-bold text-white mb-4">3D Game Creation</h3>
-                    <p className="text-gray-300 mb-6">
-                      Design immersive 3D games with intuitive tools. Place objects, create
-                      interactions, and share your game with the world.
-                    </p>
-                    <div className="flex flex-wrap gap-3 mb-6">
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-sm rounded-full">
-                        Interactive Objects
-                      </span>
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-sm rounded-full">
-                        Physics
-                      </span>
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-sm rounded-full">
-                        Multiplayer
-                      </span>
-                    </div>
-                    <a
-                      href="/editor/demo"
-                      className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium group-hover:translate-x-1 transition-transform"
-                    >
-                      Try Game Editor <ArrowRight className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-              </Link>
-
-              {/* Art Gallery Card */}
-              <Link to="/gallery/demo">
-                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-purple-500/20  overflow-hidden group hover:border-purple-500/40 transition-all shadow-lg hover:shadow-purple-500/10">
-                  <div className="h-48 bg-gradient-to-br from-purple-900/30 to-purple-700/20 flex items-center justify-center">
-                    <Paintbrush className="w-24 h-24 text-purple-400 opacity-75 group-hover:scale-110 transition-transform duration-300" />
-                  </div>
-                  <div className="p-8">
-                    <h3 className="text-2xl font-bold text-white mb-4">3D Art Gallery</h3>
-                    <p className="text-gray-300 mb-6">
-                      Create stunning virtual art galleries to showcase your artwork in an immersive
-                      3D environment that visitors can explore.
-                    </p>
-                    <div className="flex flex-wrap gap-3 mb-6">
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-sm rounded-full">
-                        Custom Layouts
-                      </span>
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-sm rounded-full">
-                        Image Upload
-                      </span>
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-sm rounded-full">
-                        Virtual Tours
-                      </span>
-                    </div>
-                    <a
-                      href="/gallery/demo"
-                      className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 font-medium group-hover:translate-x-1 transition-transform"
-                    >
-                      Try Gallery Editor <ArrowRight className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Gallery Pricing Section */}
-        <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full border border-purple-500/30 mb-4">
-                <Paintbrush className="w-5 h-5 text-purple-400" />
-                <span className="text-purple-300 font-medium">Gallery Pricing</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Choose Your Gallery Plan
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Select the perfect plan for your virtual art gallery needs. From hobbyists to
-                professional artists, we have options for everyone.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {/* Reusable SVG Check Icon Component */}
-              {(() => {
-                const CheckIcon = () => (
-                  <svg
-                    className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                );
-
-                // Feature Item Component
-                const FeatureItem = ({ text }: { text: string }) => (
-                  <li className="flex items-start gap-3">
-                    <CheckIcon />
-                    <span className="text-gray-300">{text}</span>
-                  </li>
-                );
-
-                return (
-                  <>
-                    {/* Free Tier */}
-                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700  overflow-hidden group hover:border-purple-500/40 transition-all shadow-lg hover:shadow-purple-500/10 flex flex-col">
-                      <div className="p-8 border-b border-gray-700">
-                        <h3 className="text-2xl font-bold text-white mb-2">Free Access</h3>
-                        <div className="flex items-end gap-1 mb-4">
-                          <span className="text-4xl font-bold text-white">€0</span>
-                          <span className="text-gray-400 mb-1">Freemium</span>
-                        </div>
-                        <p className="text-gray-300">Perfect for beginner artists</p>
-                      </div>
-                      <div className="p-8 flex-grow flex flex-col justify-between">
-                        <ul className="space-y-4">
-                          <FeatureItem text="3 free artworks" />
-                          <FeatureItem text="Basic gallery without custom domain" />
-                          <FeatureItem text="Low resolution images only" />
-                          <FeatureItem text="Community support" />
-                          <div className="h-12"></div> {/* Spacer for alignment */}
-                        </ul>
-                        <div className="mt-8">
-                          <a
-                            href="/gallery/demo"
-                            className="block w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium text-center rounded transition-colors"
-                          >
-                            Start Free
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Pay Per Image Tier */}
-                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-purple-500/50  overflow-hidden group hover:border-purple-500/80 transition-all shadow-lg hover:shadow-purple-500/20 relative z-10 flex flex-col">
-                      <div className="absolute top-0 left-0 right-0 bg-purple-500 text-white text-center py-1 text-sm font-medium">
-                        Most Popular
-                      </div>
-                      <div className="p-8 border-b border-gray-700 mt-6">
-                        <h3 className="text-2xl font-bold text-white mb-2">Pay Per Image</h3>
-                        <div className="flex items-end gap-1 mb-4">
-                          <span className="text-4xl font-bold text-white">€5-15</span>
-                          <span className="text-gray-400 mb-1">one-time</span>
-                        </div>
-                        <p className="text-gray-300">For independent artists</p>
-                      </div>
-                      <div className="p-8 flex-grow flex flex-col justify-between">
-                        <ul className="space-y-4">
-                          <FeatureItem text="+5 artworks → €5 one-time" />
-                          <FeatureItem text="+20 artworks → €15 one-time" />
-                          <FeatureItem text="Pay only for what you need" />
-                          <FeatureItem text="No monthly subscription" />
-                          <FeatureItem text="Perfect for small collections" />
-                        </ul>
-                        <div className="mt-8">
-                          <a
-                            href="/pricing/pay-per-image"
-                            className="block w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium text-center rounded transition-colors"
-                          >
-                            Choose Package
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Subscription Tier */}
-                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700  overflow-hidden group hover:border-purple-500/40 transition-all shadow-lg hover:shadow-purple-500/10 flex flex-col">
-                      <div className="p-8 border-b border-gray-700">
-                        <h3 className="text-2xl font-bold text-white mb-2">Subscription</h3>
-                        <div className="flex items-end gap-1 mb-4">
-                          <span className="text-4xl font-bold text-white">€9-19</span>
-                          <span className="text-gray-400 mb-1">/month</span>
-                        </div>
-                        <p className="text-gray-300">For professional artists</p>
-                      </div>
-                      <div className="p-8 flex-grow flex flex-col justify-between">
-                        <ul className="space-y-4">
-                          <FeatureItem text="PRO Plan - €9/month" />
-                          <FeatureItem text="Unlimited uploads" />
-                          <FeatureItem text="BUSINESS Plan - €19/month" />
-                          <FeatureItem text="Online shop integration" />
-                          <FeatureItem text="Custom 3D Galleries - €99 setup" />
-                        </ul>
-                        <div className="mt-8">
-                          <a
-                            href="/pricing/subscription"
-                            className="block w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium text-center rounded transition-colors"
-                          >
-                            View Plans
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-
-            <div className="text-center mt-12">
-              <p className="text-gray-400 mb-4">
-                All plans include content moderation and secure image storage
-              </p>
-              <a
-                href="/pricing"
-                className="text-purple-400 hover:text-purple-300 font-medium inline-flex items-center gap-2"
-              >
-                View full pricing details
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <HowItWorks />
-
-        <Features />
-
-        {/* Featured Games */}
-        <section className="py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-blue-500/10 border border-blue-500/20 backdrop-blur-sm rounded-full">
-                    <Gamepad2 className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <h2 className="text-3xl font-bold text-white">Featured Games</h2>
-                </div>
-                <p className="text-gray-400 max-w-2xl">
-                  Explore the most popular games created with VXLVerse's powerful game creation
-                  platform
-                </p>
-              </div>
-
-              <a
-                href="/games"
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg transition-all duration-300"
-              >
-                View All Games
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {games.map((game, index) => (
-                <GameCard
-                  key={game.id}
-                  game={{
-                    ...game,
-                    owner: game.creator, // Map creator to owner for GameCard compatibility
-                  }}
-                  index={index}
-                />
-              ))}
-            </div>
-
-            <div className="mt-8 text-center md:hidden">
-              <a
-                href="/games"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg transition-all duration-300"
-              >
-                View All Games
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Art Galleries */}
-        <section className="py-20 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-purple-500/10 border border-purple-500/20 backdrop-blur-sm rounded-full">
-                    <Paintbrush className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <h2 className="text-3xl font-bold text-white">Art Galleries</h2>
-                </div>
-                <p className="text-gray-400 max-w-2xl">
-                  Explore stunning 3D art galleries created by our community. View, create, and
-                  share your own virtual exhibitions.
-                </p>
-              </div>
-
-              <a
-                href="/gallery"
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded-lg transition-all duration-300"
-              >
-                View All Galleries
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {galleries && galleries.length > 0 ? (
-                galleries.slice(0, 3).map((gallery) => (
-                  <div
-                    key={gallery.id}
-                    className="group relative overflow-hidden rounded border border-gray-800 bg-gray-900 shadow-md transition-all hover:shadow-lg hover:shadow-purple-500/10"
-                  >
-                    <div className="aspect-video w-full overflow-hidden">
-                      <img
-                        src={gallery.thumbnailUrl || "/placeholder-gallery.jpg"}
-                        alt={gallery.title || "Gallery"}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-xl font-semibold text-white mb-2">
-                        {gallery.title || "Art Gallery"}
-                      </h3>
-                      <p className="text-gray-400 text-sm mb-3 line-clamp-2">
-                        {gallery.description || "A beautiful virtual art gallery"}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Image className="w-4 h-4 text-purple-400" />
-                          <span className="text-sm text-gray-400">
-                            {gallery.paintingCount || 0} paintings
-                          </span>
-                        </div>
-                        <a
-                          href={`/gallery/${gallery.id}`}
-                          className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-                        >
-                          Visit Gallery
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-3 p-8 text-center border border-dashed border-gray-700 rounded">
-                  <Paintbrush className="w-10 h-10 text-purple-400 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-xl font-medium text-white mb-2">No Galleries Yet</h3>
-                  <p className="text-gray-400 mb-4">
-                    Be the first to create a stunning 3D art gallery!
-                  </p>
-                  <a
-                    href="/editor/demo"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded transition-colors"
-                  >
-                    Try Gallery Editor
-                  </a>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-8 text-center md:hidden">
-              <a
-                href="/gallery"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded-lg transition-all duration-300"
-              >
-                View All Galleries
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <Footer />
-
-      {/* Modals */}
-      <CreateGameModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={() => {
-          // Just close the modal, navigation will be handled in the modal itself
-          setShowCreateModal(false);
-        }}
-      />
+      {/* 3D effect overlay */}
+      <div className="absolute inset-0 pointer-events-none z-20 bg-gradient-to-t from-transparent to-black/10 mix-blend-overlay"></div>
     </div>
   );
 }
+
+export function Home() {
+  // Add page title and meta description for better SEO
+  useEffect(() => {
+    document.title = "VXLVerse - Create 3D Games & Art Galleries Without Coding";
+
+    // Add meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute(
+        "content",
+        "Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences."
+      );
+    } else {
+      const newMetaDescription = document.createElement("meta");
+      newMetaDescription.name = "description";
+      newMetaDescription.content =
+        "Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences.";
+      document.head.appendChild(newMetaDescription);
+    }
+  }, []);
+
+  const { user } = useAuthStore();
+
+  // Add scroll animation effect for elements
+  useEffect(() => {
+    const handleScroll = () => {
+      // This could be used for future scroll animations
+      // Currently just setting up the listener for future use
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+      <Header />
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-grid-white z-0"></div>
+        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-gray-900 to-transparent z-10"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
+        <div className="absolute -left-20 top-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -right-20 top-40 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto px-4 relative z-20">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <div className="inline-block mb-6 px-4 py-1 bg-gradient-to-r from-violet-500/20 to-blue-500/20 backdrop-blur-sm border border-violet-500/30 text-violet-300 text-sm font-medium">
+              The easiest way to create 3D games and art galleries
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-blue-400 to-indigo-400">
+              <span className="sr-only">VXLVerse - </span>Create, Share, and Play 3D Experiences
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 mb-4 max-w-3xl mx-auto">
+              VXLVerse is a powerful 3D platform that lets you build immersive games and experiences
+              without coding knowledge
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
+              <div className="flex items-center gap-2 text-green-400 text-xs sm:text-sm">
+                <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-500/20 border border-green-500 flex items-center justify-center text-[8px]">
+                  ✓
+                </div>
+                <span>No coding</span>
+              </div>
+              <div className="flex items-center gap-2 text-green-400 text-xs sm:text-sm">
+                <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-500/20 border border-green-500 flex items-center justify-center text-[8px]">
+                  ✓
+                </div>
+                <span>Easy to use</span>
+              </div>
+              <div className="flex items-center gap-2 text-green-400 text-xs sm:text-sm">
+                <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-500/20 border border-green-500 flex items-center justify-center text-[8px]">
+                  ✓
+                </div>
+                <span>Create in minutes</span>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/editor/demo"
+                className="px-8 py-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                Try Editor Now
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                to="/games"
+                className="px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-medium transition-colors duration-300 flex items-center justify-center gap-2"
+                aria-label="Browse VXLVerse games"
+              >
+                Browse Games
+                <Gamepad2 className="w-5 h-5" aria-hidden="true" />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* 3D Preview */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="mt-12 relative max-w-5xl mx-auto"
+          >
+            <div className="relative">
+              {/* Grid pattern background */}
+              <div className="absolute inset-0 bg-grid-white opacity-30 z-0"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-md z-0"></div>
+
+              {/* Editor preview with "No Coding Required" badge */}
+              <div className="relative h-[300px] sm:h-[350px] md:h-[400px] overflow-hidden border border-white/20 shadow-2xl shadow-blue-500/10 z-10 bg-gray-900/80 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-grid-white opacity-20"></div>
+
+                {/* Editor interface mockup - Mobile friendly version */}
+                <div className="absolute inset-0 flex flex-col md:flex-row">
+                  {/* Left sidebar - models (hidden on mobile) */}
+                  <div className="hidden md:block w-36 lg:w-48 border-r border-white/10 bg-black/20 p-3">
+                    <div className="text-xs font-semibold text-gray-400 mb-2">3D MODELS</div>
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="mb-2 p-2 bg-white/5 border border-white/10 hover:border-blue-500/50 transition-all cursor-pointer"
+                      >
+                        <div className="w-full h-10 lg:h-12 bg-gradient-to-r from-gray-800 to-gray-900"></div>
+                        <div className="text-[10px] text-gray-400 mt-1">Model {i}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Center - canvas */}
+                  <div className="flex-1 relative">
+                    <div className="absolute inset-0 bg-grid-white opacity-30"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-24 h-24 md:w-32 md:h-32 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 shadow-lg shadow-blue-500/10 rotate-45 animate-pulse"></div>
+                      <div className="absolute w-16 h-16 md:w-24 md:h-24 bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 shadow-lg shadow-purple-500/10 rotate-12 animate-pulse"></div>
+                    </div>
+
+                    {/* Drag & Drop indicator */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-blue-500/90 text-white text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap">
+                      Drag & drop - No coding!
+                    </div>
+
+                    {/* Mobile-only simplified controls */}
+                    <div className="absolute top-2 left-2 md:hidden flex space-x-2">
+                      <div className="w-8 h-8 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center rounded-full">
+                        <Box className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <div className="w-8 h-8 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center rounded-full">
+                        <Palette className="w-4 h-4 text-purple-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right sidebar - properties (hidden on mobile) */}
+                  <div className="hidden md:block w-36 lg:w-56 border-l border-white/10 bg-black/20 p-3">
+                    <div className="text-xs font-semibold text-gray-400 mb-2">PROPERTIES</div>
+                    {["Position", "Rotation", "Scale"].map((prop) => (
+                      <div key={prop} className="mb-2">
+                        <div className="text-[10px] text-gray-300 mb-1">{prop}</div>
+                        <div className="h-6 bg-white/5 border border-white/10"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Toolbar */}
+                <div className="absolute top-0 left-0 right-0 h-8 bg-gray-800/90 border-b border-white/10 flex items-center px-3">
+                  <div className="flex space-x-1">
+                    <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+                  </div>
+                  <div className="text-xs text-gray-400 mx-auto">
+                    VXLVerse Editor - Create in Minutes
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating elements */}
+              <div className="absolute -top-6 -right-6 p-3 bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg z-20 animate-float-up">
+                <Box className="w-6 h-6 text-blue-400" />
+              </div>
+              <div className="absolute -bottom-6 -left-6 p-3 bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg z-20 animate-float-up">
+                <Palette className="w-6 h-6 text-purple-400" />
+              </div>
+
+              {/* Easy creation badge */}
+              <div className="absolute -bottom-3 right-4 sm:right-12 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-green-500/20 z-30 rotate-3">
+                Create in minutes!
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 relative">
+        <div className="absolute inset-0 bg-grid-white opacity-10 z-0"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
+              id="features"
+            >
+              Powerful Features for Creators
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Everything you need to build amazing 3D experiences in one platform
+            </p>
+            <div className="inline-block mt-4 px-3 py-1 sm:px-4 sm:py-1 bg-blue-500/20 border border-blue-500/30 backdrop-blur-sm text-blue-300 text-xs sm:text-sm font-medium">
+              Create in minutes with intuitive tools
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: Math.min(index * 0.1, 0.3) }}
+                className="p-6 bg-gradient-to-br from-gray-800/30 via-gray-900/30 to-black/30 backdrop-blur-sm border border-gray-700/30 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 group"
+              >
+                <div className="p-3 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50 inline-flex mb-4 group-hover:bg-gradient-to-br group-hover:from-blue-600 group-hover:to-purple-600 transition-colors duration-300">
+                  <feature.icon className="w-6 h-6 text-blue-400 group-hover:text-white transition-colors duration-500" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-white">{feature.title}</h3>
+                <p className="text-gray-400">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3D Art Gallery Section */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white opacity-10 z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black to-gray-900 z-0"></div>
+        <div className="absolute -left-40 top-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -right-40 bottom-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2
+                className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400"
+                id="galleries"
+              >
+                Stunning 3D Art Galleries
+              </h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">
+                Create, curate, and showcase your 3D artwork in immersive virtual galleries
+              </p>
+              <div className="inline-block mt-4 px-3 py-1 sm:px-4 sm:py-1 bg-purple-500/20 border border-purple-500/30 backdrop-blur-sm text-purple-300 text-xs sm:text-sm font-medium">
+                Just drag, drop, and design!
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="relative mx-auto max-w-full overflow-hidden">
+            <GalleryShowcase />
+          </div>
+
+          <div className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3 }}
+              className="p-6 bg-gradient-to-br from-purple-900/30 via-purple-800/20 to-purple-900/30 backdrop-blur-sm border border-purple-700/30 hover:border-purple-500/50 shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500"
+            >
+              <div className="p-3 bg-gradient-to-br from-purple-800/50 to-purple-900/50 border border-purple-700/50 inline-flex mb-4">
+                <Palette className="w-6 h-6 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-white">Customizable Spaces</h3>
+              <p className="text-gray-300">
+                Design your gallery with customizable lighting, textures, and layouts to perfectly
+                showcase your artwork
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="p-6 bg-gradient-to-br from-pink-900/30 via-pink-800/20 to-pink-900/30 backdrop-blur-sm border border-pink-700/30 hover:border-pink-500/50 shadow-xl hover:shadow-2xl hover:shadow-pink-500/10 transition-all duration-500"
+            >
+              <div className="p-3 bg-gradient-to-br from-pink-800/50 to-pink-900/50 border border-pink-700/50 inline-flex mb-4">
+                <Eye className="w-6 h-6 text-pink-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-white">Immersive Viewing</h3>
+              <p className="text-gray-300">
+                Invite visitors to explore your gallery in first-person view with interactive
+                elements and ambient audio
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="p-6 bg-gradient-to-br from-indigo-900/30 via-indigo-800/20 to-indigo-900/30 backdrop-blur-sm border border-indigo-700/30 hover:border-indigo-500/50 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500"
+            >
+              <div className="p-3 bg-gradient-to-br from-indigo-800/50 to-indigo-900/50 border border-indigo-700/50 inline-flex mb-4">
+                <Image className="w-6 h-6 text-indigo-400" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-white">Multi-Format Support</h3>
+              <p className="text-gray-300">
+                Display various 3D formats, textures, and animations with detailed information cards
+                and descriptions
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/gallery"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transition-all duration-300"
+            >
+              Explore Galleries
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Showcase Section */}
+      <section className="py-20 relative bg-gradient-to-b from-gray-900 to-black">
+        <div className="absolute inset-0 bg-grid-white opacity-50 z-0"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
+              id="games"
+            >
+              Featured Games
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Check out these amazing games created with VXLVerse
+            </p>
+            <div className="inline-block mt-4 px-3 py-1 sm:px-4 sm:py-1 bg-green-500/20 border border-green-500/30 backdrop-blur-sm text-green-300 text-xs sm:text-sm font-medium">
+              No coding needed!
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredGames.map((game, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: Math.min(index * 0.1, 0.3) }}
+                className="group relative h-[20rem] overflow-hidden backdrop-blur-sm bg-gradient-to-br from-gray-800/30 via-gray-900/30 to-black/30 border border-gray-700/30 hover:border-blue-500/50 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 flex flex-col"
+              >
+                {/* Thumbnail */}
+                <div
+                  className="relative h-48 overflow-hidden"
+                  style={{ backgroundColor: game.color }}
+                >
+                  <img
+                    src={game.image}
+                    alt={game.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    width="400"
+                    height="300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
+
+                  {/* Play button overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Link to={`/play/${game.id}`}>
+                      <div className="bg-blue-500 p-3 shadow-lg shadow-blue-500/25 backdrop-blur-sm">
+                        <Trophy className="w-6 h-6 text-white" />
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative flex-1 p-4 flex flex-col">
+                  {/* Decorative elements */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-blue-500/10 pointer-events-none" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-blue-500/20 blur-3xl pointer-events-none" />
+
+                  {/* Title */}
+                  <div className="relative flex items-start justify-between gap-2 mb-2">
+                    <h3 className="text-base font-bold truncate">{game.title}</h3>
+                  </div>
+
+                  {/* Description */}
+                  <p className="relative text-gray-300 text-xs line-clamp-2 leading-relaxed mb-2">
+                    {game.description}
+                  </p>
+
+                  {/* Stats */}
+                  <div className="relative flex items-center gap-3 text-[10px] mt-auto">
+                    <div className="flex items-center gap-1">
+                      <div className="p-1 bg-yellow-500/10 backdrop-blur-sm">
+                        <Star className="w-3 h-3 text-yellow-500" />
+                      </div>
+                      <span className="text-yellow-500 font-medium">{game.rating}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="p-1 bg-blue-500/10 backdrop-blur-sm">
+                        <Users className="w-3 h-3 text-blue-400" />
+                      </div>
+                      <span className="text-blue-400 font-medium">{game.players}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/games"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-medium transition-all duration-300"
+            >
+              View All Games
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 relative">
+        <div className="absolute inset-0 bg-grid-white opacity-20 z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20 z-0"></div>
+        <div className="absolute -left-20 bottom-0 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -right-20 bottom-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2
+                className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-blue-400"
+                id="get-started"
+              >
+                Ready to Create Your Own 3D Experience?
+              </h2>
+              <p className="text-lg text-gray-300 mb-4 max-w-2xl mx-auto">
+                Join thousands of creators building amazing games and experiences on VXLVerse
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-sm border border-white/10 text-white text-xs sm:text-sm">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500 flex items-center justify-center text-[8px] sm:text-[10px] font-bold">
+                    ✓
+                  </div>
+                  <span>No coding</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-sm border border-white/10 text-white text-xs sm:text-sm">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500 flex items-center justify-center text-[8px] sm:text-[10px] font-bold">
+                    ✓
+                  </div>
+                  <span>Quick create</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 backdrop-blur-sm border border-white/10 text-white text-xs sm:text-sm">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500 flex items-center justify-center text-[8px] sm:text-[10px] font-bold">
+                    ✓
+                  </div>
+                  <span>Instant publish</span>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {user ? (
+                  <Link
+                    to="/editor/new"
+                    className="px-8 py-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    Start Creating
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="px-8 py-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    Sign Up Free
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                )}
+                <Link
+                  to="/how-it-works"
+                  className="px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-medium transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  Learn More
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
+
+// Features data
+const features = [
+  {
+    icon: Box,
+    title: "3D Model Library",
+    description: "Access thousands of 3D models to use in your games and experiences",
+  },
+  {
+    icon: Gamepad2,
+    title: "Game Creation",
+    description: "Build interactive games with our intuitive visual editor - no coding required",
+  },
+  {
+    icon: Palette,
+    title: "Art Gallery",
+    description: "Showcase your 3D art creations in beautiful virtual galleries",
+  },
+  {
+    icon: Zap,
+    title: "Real-time Collaboration",
+    description: "Work together with friends and teammates in real-time on your projects",
+  },
+  {
+    icon: Users,
+    title: "Community",
+    description: "Join a thriving community of creators and players to share your work",
+  },
+  {
+    icon: Trophy,
+    title: "Competitions",
+    description: "Participate in regular competitions and showcase your creative skills",
+  },
+];
+
+// Featured games data
+const featuredGames = [
+  {
+    id: "1",
+    title: "Voxel Adventure",
+    description: "Explore a vast voxel world filled with treasures and dangers",
+    image:
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    color: "#3b82f6",
+    rating: "4.8",
+    players: "2.3k",
+  },
+  {
+    id: "2",
+    title: "Cube Racer",
+    description: "Race through challenging tracks in this high-speed voxel racing game",
+    image:
+      "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    color: "#8b5cf6",
+    rating: "4.5",
+    players: "1.8k",
+  },
+  {
+    id: "3",
+    title: "Block Battles",
+    description: "Strategic multiplayer battles in a destructible voxel environment",
+    image:
+      "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+    color: "#ec4899",
+    rating: "4.7",
+    players: "3.1k",
+  },
+];
