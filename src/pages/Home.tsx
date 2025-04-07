@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
 import {
@@ -221,6 +222,13 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+      <Helmet>
+        <title>VXLVerse - Create 3D Games & Art Galleries Without Coding</title>
+        <meta
+          name="description"
+          content="Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences."
+        />
+      </Helmet>
       <Header />
 
       {/* Hero Section */}
