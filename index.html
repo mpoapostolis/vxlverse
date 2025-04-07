@@ -5,7 +5,7 @@
     <link rel="icon" type="image/png" href="/icons/ios/32.png" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
     />
     <title>VXLverse - 3D Game Creation & Virtual Art Gallery Platform</title>
     <meta
@@ -104,6 +104,8 @@
       content="Build immersive 3D games and stunning virtual art galleries without coding. Design interactive worlds, showcase artwork in 3D spaces, and share your creations with the VXLverse community."
     />
     <meta property="og:image" content="https://vxlverse.com/demo-images/Editor.png" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <meta property="og:image:alt" content="VXLverse 3D creation platform interface" />
     <meta property="og:site_name" content="VXLverse" />
 
@@ -198,6 +200,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <div style="text-align: center; padding: 2rem;">
+        <h1>JavaScript Required</h1>
+        <p>Please enable JavaScript to use VXLverse - a 3D game creation and virtual art gallery platform.</p>
+      </div>
+    </noscript>
     <script>
       // Service worker management - only register in production
       if ("serviceWorker" in navigator) {

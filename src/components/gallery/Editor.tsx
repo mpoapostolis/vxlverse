@@ -7,7 +7,7 @@ import {
 } from "@react-three/drei";
 import { ArtGalleryModel } from "./ArtGalleryModel";
 import { Painting } from "./Painting";
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import * as THREE from "three";
 import { PhysicsArea } from "./PhysicsArea";
 import { useThree } from "@react-three/fiber";
@@ -88,7 +88,9 @@ export function ArtEditor({ transformMode = "translate" }: EditorSceneProps = {}
         />
       )}
 
-      <PhysicsArea />
+      <Suspense>
+        <PhysicsArea />
+      </Suspense>
       {/* Gallery Model */}
       <ArtGalleryModel />
 
@@ -96,22 +98,24 @@ export function ArtEditor({ transformMode = "translate" }: EditorSceneProps = {}
       {objects
         ?.filter((obj) => obj.type === "painting")
         ?.map((painting) => (
-          <Painting
-            key={painting.id}
-            imageUrl={painting.imageUrl ?? ""}
-            position={painting.position}
-            rotation={painting.rotation}
-            scale={painting.scale}
-            width={1}
-            height={1}
-            isSelected={painting.id === selectedObjectId}
-            onClick={() => setSelectedObject(painting.id)}
-            ref={
-              painting.id === selectedObjectId
-                ? (selectedPaintingRef as React.RefObject<THREE.Group>)
-                : undefined
-            }
-          />
+          <Suspense>
+            <Painting
+              key={painting.id}
+              imageUrl={painting.imageUrl ?? ""}
+              position={painting.position}
+              rotation={painting.rotation}
+              scale={painting.scale}
+              width={1}
+              height={1}
+              isSelected={painting.id === selectedObjectId}
+              onClick={() => setSelectedObject(painting.id)}
+              ref={
+                painting.id === selectedObjectId
+                  ? (selectedPaintingRef as React.RefObject<THREE.Group>)
+                  : undefined
+              }
+            />
+          </Suspense>
         ))}
 
       {/* Box Colliders */}
