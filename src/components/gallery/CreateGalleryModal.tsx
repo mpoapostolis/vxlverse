@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Image, Loader2 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
-import { Button } from "../UI/Button";
+import { pb } from "../../lib/pocketbase";
 import { Input } from "../UI/input";
+import { Object3D } from "three";
 
 interface CreateGalleryModalProps {
   isOpen: boolean;
@@ -32,6 +33,12 @@ export function CreateGalleryModal({ isOpen, onClose, onSuccess }: CreateGallery
       return;
     }
 
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5MB");
+      return;
+    }
+
     setThumbnailFile(file);
     setError(null);
 
@@ -45,9 +52,21 @@ export function CreateGalleryModal({ isOpen, onClose, onSuccess }: CreateGallery
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
 
+    // Validate form
     if (!title.trim()) {
       setError("Please enter a gallery title");
+      return;
+    }
+
+    if (title.length < 3) {
+      setError("Gallery title must be at least 3 characters long");
+      return;
+    }
+
+    if (!description.trim()) {
+      setError("Please enter a gallery description");
       return;
     }
 
@@ -60,12 +79,39 @@ export function CreateGalleryModal({ isOpen, onClose, onSuccess }: CreateGallery
     setError(null);
 
     try {
-      // In a real app, this would be an API call to create the gallery
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Create FormData for PocketBase upload
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("creator", user.id);
+      formData.append("paintingCount", "0"); // Initial count is 0
+      formData.append("isPublic", "false");
+      formData.append("type", "gallery");
+      const owner = user.id;
+      formData.append("owner", owner);
+      const uuid = new Object3D().uuid;
+      const currentSceneId = uuid;
+      const scenes = [{ id: currentSceneId, objects: [] }];
+      const gameConf = JSON.stringify({ scenes, currentSceneId, gridSnap: false });
+      formData.append("gameConf", gameConf);
 
-      // Simulate successful creation
+      // Add thumbnail file
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
+
+      // Save to PocketBase
+      await pb.collection("games").create(formData);
+
+      // Reset form and notify parent component
+      setTitle("");
+      setDescription("");
+      setThumbnailFile(null);
+      setThumbnailPreview(null);
+
       onSuccess();
     } catch (err) {
+      console.error("Failed to create gallery:", err);
       setError("Failed to create gallery. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -74,7 +120,7 @@ export function CreateGalleryModal({ isOpen, onClose, onSuccess }: CreateGallery
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-white/10  max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-900 border border-white/10 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-5 border-b border-white/10 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">Create New Gallery</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
@@ -82,137 +128,109 @@ export function CreateGalleryModal({ isOpen, onClose, onSuccess }: CreateGallery
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
-              Gallery Title
-            </label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter a title for your gallery"
-              className="w-full"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1">
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your gallery"
-              className="w-full h-24 px-3 py-2 bg-white/5 border border-white/10  text-white placeholder:text-gray-500 
-                       focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-300 mb-1">
-              Gallery Thumbnail
-            </label>
-            <div
-              className="border-2 border-dashed border-white/10  p-4 text-center cursor-pointer hover:border-blue-500/50 transition-colors"
-              onClick={() => document.getElementById("thumbnail")?.click()}
-            >
+        <form onSubmit={handleSubmit} className="p-5 space-y-6">
+          {/* Thumbnail Upload */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300">Thumbnail</label>
+            <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-2 border-dashed border-white/10 hover:border-blue-400/50 transition-all duration-300 group">
               {thumbnailPreview ? (
-                <div className="relative">
+                <div className="relative h-full">
                   <img
                     src={thumbnailPreview}
                     alt="Thumbnail preview"
-                    className="max-h-48 mx-auto "
+                    className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all duration-300" />
                   <button
                     type="button"
-                    className="absolute top-2 right-2 bg-red-500 -full p-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       setThumbnailFile(null);
                       setThumbnailPreview(null);
                     }}
+                    className="absolute top-4 right-4 p-2.5 bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500/30 hover:scale-110"
                   >
-                    <X size={16} className="text-white" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <div className="py-8">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    stroke="currentColor"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <p className="mt-2 text-sm text-gray-400">
-                    Click to upload a thumbnail image (16:9 ratio recommended)
-                  </p>
-                </div>
+                <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer group-hover:bg-white/5 transition-all duration-300">
+                  <div className="p-4 bg-gradient-to-br from-blue-500/10 to-violet-500/10 group-hover:scale-110 transition-all duration-300">
+                    <Image className="w-8 h-8 text-gray-500 group-hover:text-blue-400 transition-colors duration-300" />
+                  </div>
+                  <span className="text-sm text-gray-500 group-hover:text-blue-400 mt-4 transition-colors duration-300">
+                    Click to upload thumbnail
+                  </span>
+                  <span className="text-xs text-gray-600 mt-1">Recommended: 1920x1080px</span>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailChange}
+                    className="hidden"
+                  />
+                </label>
               )}
-              <input
-                id="thumbnail"
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailChange}
-                className="hidden"
-              />
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300">Title</label>
+            <Input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-4 py-3 bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
+              placeholder="Enter gallery title"
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300">Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full px-4 py-3 bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 resize-none"
+              placeholder="Enter gallery description"
+              rows={4}
+              required
+              maxLength={500}
+            />
+            <div className="text-xs text-gray-500 mt-1 text-right">
+              {description.length}/500 characters
             </div>
           </div>
 
           {error && (
-            <div className="p-3 bg-red-500/20 border border-red-500/50  text-red-300 text-sm">
+            <div className="p-3 bg-red-500/20 border border-red-500/50 text-red-300 text-sm">
               {error}
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" size="sm" onClick={onClose} disabled={isSubmitting}>
+          {/* Submit Button */}
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:shadow-lg hover:shadow-black/20"
+            >
               Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
+            </button>
+            <button
               type="submit"
               disabled={isSubmitting}
-              className="min-w-[100px]"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 disabled:opacity-50 disabled:hover:from-blue-500 disabled:hover:to-violet-500 text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25"
             >
               {isSubmitting ? (
-                <div className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Creating...
-                </div>
+                </>
               ) : (
                 "Create Gallery"
               )}
-            </Button>
+            </button>
           </div>
         </form>
       </div>

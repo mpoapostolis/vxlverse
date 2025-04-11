@@ -2,18 +2,7 @@ import { Link } from "react-router-dom";
 import { Eye, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-interface Gallery {
-  id: string;
-  title: string;
-  description: string;
-  thumbnailUrl: string;
-  createdAt: string;
-  creator: {
-    id: string;
-    username: string;
-  };
-  paintingCount: number;
-}
+import { Gallery } from "../../hooks/useGalleries";
 
 interface GalleryCardProps {
   gallery: Gallery;
@@ -25,7 +14,7 @@ export function GalleryCard({ gallery }: GalleryCardProps) {
       <Link to={`/gallery/${gallery.id}`} className="block">
         <div className="aspect-video relative overflow-hidden">
           <img
-            src={gallery.thumbnailUrl}
+            src={gallery.thumbnailUrl || "https://api.vxlverse.com/placeholder-gallery.jpg"}
             alt={gallery.title}
             className="w-full h-full object-cover transition-transform group-hover:scale-105"
           />

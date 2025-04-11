@@ -537,7 +537,7 @@ export const debounce = <T extends (...args: any[]) => any>(
 const debouncedUpdate = debounce(async (state: EditorState, gameId: string) => {
   try {
     if (!gameId) return;
-
+    console.log("Saving editor state...", gameId);
     await pb.collection("games").update(gameId, {
       gameConf: {
         scenes: state.scenes,
