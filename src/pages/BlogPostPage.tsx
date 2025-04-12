@@ -6,6 +6,7 @@ import { Spinner } from "../components/ui/Spinner";
 import { FaTag, FaTwitter, FaFacebook, FaLinkedin } from "react-icons/fa";
 import useSWR from "swr";
 import { Header } from "../components/layout/Header";
+import { Footer } from "../components/layout/Footer";
 
 // Fetcher function for the blog post - just one simple function to get a single post by ID
 async function fetchBlogPost(id: string) {
@@ -274,6 +275,8 @@ export function BlogPostPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

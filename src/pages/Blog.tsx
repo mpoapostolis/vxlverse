@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import useSWR from "swr";
 import { Header } from "../components/layout/Header";
+import { Footer } from "../components/layout/Footer";
 // Fetcher function for the blog post
 async function fetchBlogPost(id: string) {
   const record = await pb.collection("blog_articles").getOne(id, {
@@ -267,6 +268,8 @@ export function Blog() {
             </div>
           </div>
         </div>
+
+        <Footer />
       </div>
     );
   }
@@ -522,6 +525,8 @@ export function Blog() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }
