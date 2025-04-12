@@ -4,6 +4,7 @@ import { Check, Crown, Zap, Shield, Users } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "../components/layout/Header";
+import { Footer } from "../components/layout/Footer";
 
 interface PricingTier {
   name: string;
@@ -307,12 +308,7 @@ export function Pricing() {
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="py-8 border-t border-gray-800/50">
-          <div className="container mx-auto px-4 text-center text-gray-400 text-sm">
-            <p>© {new Date().getFullYear()} VXLVerse. All rights reserved.</p>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </>
   );

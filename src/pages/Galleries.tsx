@@ -20,6 +20,7 @@ import { Button } from "../components/UI/Button";
 import { GalleryCard } from "../components/gallery/GalleryCard";
 import { Header } from "../components/layout/Header";
 import { Input } from "../components/UI/input";
+import { Footer } from "../components/layout/Footer";
 
 export function Galleries() {
   const [activeTab, setActiveTab] = useState<"all" | "my" | "featured">("all");
@@ -346,6 +347,7 @@ export function Galleries() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }

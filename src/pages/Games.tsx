@@ -8,6 +8,7 @@ import { Button } from "../components/UI/Button";
 import { GameCard } from "../components/game/GameCard";
 import { Header } from "../components/layout/Header";
 import { Input } from "../components/UI/input";
+import { Footer } from "../components/layout/Footer";
 
 export function Games() {
   const [activeTab, setActiveTab] = useState<"all" | "my">("all");
@@ -168,6 +169,7 @@ export function Games() {
           mutate();
         }}
       />
+      <Footer />
     </div>
   );
 }

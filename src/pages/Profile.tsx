@@ -782,9 +782,7 @@ export function Profile() {
           </div>
         </div>
       </main>
-
-      {/* Footer Component can be added here if needed */}
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { useAuthStore } from "../stores/authStore";
 import { GameCard } from "../components/game/GameCard";
 import { useGames } from "../hooks/useGames";
 import { Heart } from "lucide-react";
+import { Footer } from "../components/layout/Footer";
 
 export function Favorites() {
   const { user } = useAuthStore();
@@ -46,6 +47,7 @@ export function Favorites() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
