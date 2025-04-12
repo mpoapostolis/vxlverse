@@ -189,34 +189,12 @@ function GalleryShowcase() {
 }
 
 export function Home() {
-  // Add page title and meta description for better SEO
-  useEffect(() => {
-    document.title = "VXLVerse - Create 3D Games & Art Galleries Without Coding";
-
-    // Add meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute(
-        "content",
-        "Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences."
-      );
-    } else {
-      const newMetaDescription = document.createElement("meta");
-      newMetaDescription.name = "description";
-      newMetaDescription.content =
-        "Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences.";
-      document.head.appendChild(newMetaDescription);
-    }
-  }, []);
-
   const { user } = useAuthStore();
-
-  // We don't need the scroll listener yet, so removing it for better performance
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
       <Helmet>
-        <title>VXLVerse - Create 3D Games & Art Galleries Without Coding</title>
+        <title>XXXX - Create 3D Games & Art Galleries Without Coding</title>
         <meta
           name="description"
           content="Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences."
