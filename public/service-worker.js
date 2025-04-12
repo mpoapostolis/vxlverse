@@ -1,5 +1,5 @@
 // Service Worker for VXLverse PWA
-const CACHE_NAME = 'vxlverse-v1';
+const CACHE_NAME = 'vxlverse-v2'; // Increment this version to force update
 
 // Assets to cache on install
 const urlsToCache = [
@@ -12,6 +12,7 @@ const urlsToCache = [
 
 // Install event - cache assets
 self.addEventListener('install', event => {
+  console.log('Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -23,22 +24,38 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and notify clients
 self.addEventListener('activate', event => {
+  console.log('Service Worker activating...');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
+    .then(() => {
+      console.log('Service Worker activated - claiming clients');
+      // Claim clients so the SW is in control immediately
+      return self.clients.claim();
+    })
+    .then(() => {
+      // Notify all clients that an update is available
+      return self.clients.matchAll().then(clients => {
+        return Promise.all(clients.map(client => {
+          return client.postMessage({
+            type: 'UPDATE_AVAILABLE',
+            newVersion: CACHE_NAME
+          });
+        }));
+      });
+    })
   );
-  // Claim clients so the SW is in control immediately
-  self.clients.claim();
 });
 
 // Fetch event - serve from cache or network
