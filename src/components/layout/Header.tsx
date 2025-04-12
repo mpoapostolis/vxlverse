@@ -57,8 +57,19 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-gray-900/95 backdrop-blur-md shadow-xl" : "bg-transparent"}`}
-      style={{ position: "fixed", top: 0, left: 0, right: 0, width: "100%" }}
+      className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 ${isScrolled ? "bg-gray-900/95 backdrop-blur-md shadow-xl" : "bg-transparent"}`}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        width: "100%",
+        zIndex: 9999,
+        WebkitTransform: "translateZ(0)",
+        transform: "translateZ(0)",
+        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: "hidden",
+      }}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/98 to-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-800/50 -z-10"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
