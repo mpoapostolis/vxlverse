@@ -147,6 +147,21 @@ export function Header() {
                   <span>Pricing</span>
                 </div>
               </Link>
+              <Link
+                to="/blog"
+                className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${
+                  location.pathname === "/blog" || location.pathname.startsWith("/blog/")
+                    ? "text-white bg-gradient-to-r from-blue-600/80 to-violet-600/80 shadow-lg shadow-blue-500/20"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
+                aria-current={
+                  location.pathname === "/blog" || location.pathname.startsWith("/blog/")
+                    ? "page"
+                    : undefined
+                }
+              >
+                <span>Blog</span>
+              </Link>
             </nav>
 
             <div className="flex items-center">

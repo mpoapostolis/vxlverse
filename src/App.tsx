@@ -30,6 +30,10 @@ const Galleries = lazy(() =>
 const Pricing = lazy(() =>
   import("./pages/Pricing").then((module) => ({ default: module.Pricing }))
 );
+const Blog = lazy(() => import("./pages/Blog").then((module) => ({ default: module.Blog })));
+const BlogPost = lazy(() =>
+  import("./pages/BlogPostPage").then((module) => ({ default: module.BlogPostPage }))
+);
 
 export default function App() {
   return (
@@ -45,6 +49,8 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/editor/demo" element={<Editor />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
 
           <Route
             path="/editor/:id"
