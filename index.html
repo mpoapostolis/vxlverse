@@ -3,10 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icons/ios/32.png" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
     <title>VXLverse - 3D Game Creation & Virtual Art Gallery Platform</title>
     <meta
       name="description"
@@ -168,7 +165,7 @@
         ]
       }
     </script>
-    
+
     <!-- Structured Data - Art Gallery -->
     <script type="application/ld+json">
       {
@@ -201,11 +198,15 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <noscript>
-      <div style="text-align: center; padding: 2rem;">
+      <div style="text-align: center; padding: 2rem">
         <h1>JavaScript Required</h1>
-        <p>Please enable JavaScript to use VXLverse - a 3D game creation and virtual art gallery platform.</p>
+        <p>
+          Please enable JavaScript to use VXLverse - a 3D game creation and virtual art gallery
+          platform.
+        </p>
       </div>
     </noscript>
+
     <script>
       // Service worker management - only register in production
       if ("serviceWorker" in navigator) {
@@ -232,9 +233,21 @@
           // In production: register the service worker
           else {
             navigator.serviceWorker
-              .register("/sw.js")
+              .register("/service-worker.js")
               .then((registration) => {
                 console.log("Service Worker registered with scope:", registration.scope);
+
+                // Check for updates immediately after registration
+                registration.update();
+
+                // Set up periodic updates
+                setInterval(
+                  () => {
+                    registration.update();
+                    console.log("Checking for service worker updates...");
+                  },
+                  60 * 60 * 1000
+                ); // Check every hour
               })
               .catch((error) => {
                 console.error("Service Worker registration failed:", error);
