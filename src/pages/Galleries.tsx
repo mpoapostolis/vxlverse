@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CreateGalleryModal } from "../components/gallery/CreateGalleryModal";
 import {
   Plus,
@@ -57,50 +57,6 @@ export function Galleries() {
     setSearch("");
     setSelectedTags([]);
   }, [activeTab]);
-
-  const filteredGalleries = useMemo(() => {
-    if (!galleries) return [];
-    let filtered = [...galleries];
-
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filtered = filtered.filter(
-        (gallery) =>
-          gallery.title.toLowerCase().includes(searchLower) ||
-          gallery.description.toLowerCase().includes(searchLower)
-      );
-    }
-
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter((gallery) => {
-        const galleryTags = gallery.tags || [];
-        return selectedTags.every((tag) => galleryTags.includes(tag));
-      });
-    }
-
-    if (activeTab === "my" && user) {
-      filtered = filtered.filter((gallery) => gallery.creator.id === user.id);
-    } else if (activeTab === "featured") {
-      // This is a placeholder for featured galleries
-      // In a real implementation, you would filter by a 'featured' property
-      filtered = filtered.slice(0, Math.min(6, filtered.length));
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case "newest":
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case "updated":
-        filtered.sort((a, b) => new Date(b.updated).getTime() - new Date(a.updated).getTime());
-        break;
-      case "popular":
-        filtered.sort((a, b) => b.paintingCount - a.paintingCount);
-        break;
-    }
-
-    return filtered;
-  }, [galleries, search, selectedTags, activeTab, user?.id]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-slate-900 to-black">
@@ -203,8 +159,7 @@ export function Galleries() {
               {search && (
                 <div className="absolute -bottom-6 left-0 text-xs text-blue-300 flex items-center">
                   <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
-                  Found {filteredGalleries.length}{" "}
-                  {filteredGalleries.length === 1 ? "result" : "results"}
+                  Found {galleries.length} {galleries.length === 1 ? "result" : "results"}
                   {(search || selectedTags.length > 0) && (
                     <button
                       onClick={handleClearFilters}
@@ -306,13 +261,13 @@ export function Galleries() {
           ${viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-4"}
         `}
         >
-          {filteredGalleries.map((gallery) => (
+          {galleries.map((gallery) => (
             <GalleryCard key={gallery.id} gallery={gallery} />
           ))}
         </div>
 
         {/* Empty State */}
-        {!isLoading && filteredGalleries.length === 0 && (
+        {!isLoading && galleries.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-gradient-to-b from-white/5 to-white/2 border border-white/10 rounded-xl shadow-xl animate-fadeIn backdrop-blur-sm">
             <div className="w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg border border-white/5 animate-pulse">
               {search ? (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 import { pb } from "../lib/pocketbase";
 
 export interface Gallery {
@@ -19,68 +19,69 @@ export interface Gallery {
   type: string;
 }
 
-export function useGalleries() {
-  const [galleries, setGalleries] = useState<Gallery[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+// Fetcher function for SWR
+const fetchGalleries = async () => {
+  try {
+    // Fetch galleries from PocketBase games collection with type=gallery
+    const response = await pb.collection("games").getList(1, 100, {
+      filter: 'type = "gallery"',
+      sort: "-created",
+      expand: "owner",
+    });
 
-  const fetchGalleries = async () => {
-    setIsLoading(true);
-    try {
-      // Fetch galleries from PocketBase games collection with type=gallery
-      const response = await pb.collection("games").getList(1, 100, {
-        filter: 'type = "gallery"',
-        sort: "-created",
-        expand: "owner",
-      });
+    // Transform the response to match our Gallery interface
+    return response.items.map((item) => {
+      // Get the thumbnail URL if it exists
+      const thumbnailUrl = item.thumbnail ? pb.files.getURL(item, item.thumbnail) : "";
 
-      // Transform the response to match our Gallery interface
-      const fetchedGalleries = response.items.map((item) => {
-        // Get the creator information
-
-        // Get the thumbnail URL if it exists
-        const thumbnailUrl = item.thumbnail ? pb.files.getURL(item, item.thumbnail) : "";
-
-        // Parse tags if they exist and are stored as a JSON string
-        let tags: string[] = [];
-        if (item.tags) {
-          try {
-            tags = typeof item.tags === "string" ? JSON.parse(item.tags) : item.tags;
-          } catch (e) {
-            console.error("Error parsing tags:", e);
-          }
+      // Parse tags if they exist and are stored as a JSON string
+      let tags: string[] = [];
+      if (item.tags) {
+        try {
+          tags = typeof item.tags === "string" ? JSON.parse(item.tags) : item.tags;
+        } catch (e) {
+          console.error("Error parsing tags:", e);
         }
+      }
 
-        return {
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          thumbnail: item.thumbnail,
-          thumbnailUrl,
-          createdAt: item.created,
-          updated: item.updated,
-          creator: item.expand?.owner.email || "Unknown",
-          paintingCount: item.gameConf?.scenes?.at(0)?.objects?.length || 0,
-          tags,
-          isPublic: item.isPublic,
-          type: item.type,
-        };
-      });
+      return {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        thumbnail: item.thumbnail,
+        thumbnailUrl,
+        gameConf: item.gameConf,
+        createdAt: item.created,
+        updated: item.updated,
+        creator: item.expand?.owner?.email || "Unknown", // Use optional chaining to prevent errors when not logged in
+        paintingCount: item.gameConf?.scenes?.at(0)?.objects?.length || 0,
+        tags,
+        isPublic: item.isPublic,
+        type: item.type,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching galleries:", error);
+    return [];
+  }
+};
 
-      setGalleries(fetchedGalleries);
-    } catch (error) {
-      console.error("Error fetching galleries:", error);
-    } finally {
-      setIsLoading(false);
-    }
+export function useGalleries() {
+  const {
+    data: galleries = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<Gallery[]>("galleries", fetchGalleries, {
+    revalidateOnFocus: false,
+    dedupingInterval: 10000, // 10 seconds
+    refreshInterval: 60000, // 1 minute
+  });
+
+  return {
+    galleries,
+    isLoading,
+    error,
+    mutate,
   };
-
-  useEffect(() => {
-    fetchGalleries();
-  }, []);
-
-  const mutate = async () => {
-    await fetchGalleries();
-  };
-
-  return { galleries, isLoading, mutate };
 }
