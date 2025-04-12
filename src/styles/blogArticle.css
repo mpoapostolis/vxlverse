@@ -1,0 +1,355 @@
+/* Blog Article Styling for VXLVerse */
+
+/* Base article styling */
+.blog-article {
+  color: #f0f0f0;
+  line-height: 1.8;
+  font-size: 1.125rem;
+}
+
+/* Headings */
+.blog-article h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 2rem 0 1.5rem;
+  color: #d4b6ff;
+  line-height: 1.2;
+}
+
+.blog-article h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 2rem 0 1.25rem;
+  color: #c4a6ff;
+  line-height: 1.3;
+  border-bottom: 1px solid rgba(138, 75, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.blog-article h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.75rem 0 1rem;
+  color: #b496ff;
+}
+
+.blog-article h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+  color: #a486ff;
+}
+
+.blog-article h5,
+.blog-article h6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem;
+  color: #9476ff;
+}
+
+/* Paragraphs */
+.blog-article p {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+/* Links */
+.blog-article a {
+  color: #a67bff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(166, 123, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.blog-article a:hover {
+  color: #c4a6ff;
+  border-bottom-color: rgba(196, 166, 255, 0.6);
+}
+
+/* Lists */
+.blog-article ul,
+.blog-article ol {
+  margin: 1.5rem 0;
+  padding-left: 1.75rem;
+}
+
+.blog-article ul {
+  list-style-type: disc;
+}
+
+.blog-article ol {
+  list-style-type: decimal;
+}
+
+.blog-article li {
+  margin-bottom: 0.75rem;
+  padding-left: 0.5rem;
+}
+
+.blog-article li > ul,
+.blog-article li > ol {
+  margin: 0.75rem 0;
+}
+
+/* Blockquotes */
+.blog-article blockquote {
+  margin: 2rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 4px solid #8a4bff;
+  background-color: rgba(138, 75, 255, 0.1);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+  color: #d4d4d4;
+}
+
+.blog-article blockquote p {
+  margin-bottom: 0.5rem;
+}
+
+.blog-article blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Code blocks */
+.blog-article pre {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background-color: rgba(30, 30, 30, 0.8);
+  border: 1px solid rgba(80, 80, 80, 0.5);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.blog-article code {
+  font-family: "Fira Code", "Consolas", monospace;
+  background-color: rgba(60, 60, 60, 0.7);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  color: #b496ff;
+}
+
+.blog-article pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: #e0e0e0;
+}
+
+/* Horizontal rule */
+.blog-article hr {
+  margin: 2.5rem 0;
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(138, 75, 255, 0),
+    rgba(138, 75, 255, 0.5),
+    rgba(138, 75, 255, 0)
+  );
+}
+
+/* Tables */
+.blog-article table {
+  width: 100%;
+  margin: 2rem 0;
+  border-collapse: collapse;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.blog-article th {
+  background-color: rgba(60, 60, 60, 0.8);
+  color: #d4b6ff;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(80, 80, 80, 0.5);
+}
+
+.blog-article td {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(80, 80, 80, 0.5);
+  background-color: rgba(40, 40, 40, 0.5);
+}
+
+.blog-article tr:nth-child(even) td {
+  background-color: rgba(50, 50, 50, 0.5);
+}
+
+/* Images */
+.blog-article img {
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: block;
+}
+
+.blog-article figure {
+  margin: 2rem 0;
+}
+
+.blog-article figcaption {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  margin-top: 0.75rem;
+}
+
+/* Definition lists */
+.blog-article dl {
+  margin: 1.5rem 0;
+}
+
+.blog-article dt {
+  font-weight: 600;
+  color: #b496ff;
+  margin-top: 1rem;
+}
+
+.blog-article dd {
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Abbreviations */
+.blog-article abbr {
+  cursor: help;
+  border-bottom: 1px dotted #a67bff;
+}
+
+/* Keyboard, etc. */
+.blog-article kbd {
+  background-color: #333;
+  border: 1px solid #555;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  color: #fff;
+  display: inline-block;
+  font-family: monospace;
+  font-size: 0.9em;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  margin: 0 0.25rem;
+}
+
+/* Syntax highlighting for code blocks */
+.blog-article .hljs-keyword {
+  color: #ff79c6;
+}
+
+.blog-article .hljs-string {
+  color: #f1fa8c;
+}
+
+.blog-article .hljs-comment {
+  color: #6272a4;
+}
+
+.blog-article .hljs-function {
+  color: #50fa7b;
+}
+
+.blog-article .hljs-number {
+  color: #bd93f9;
+}
+
+.blog-article .hljs-operator {
+  color: #ff79c6;
+}
+
+.blog-article .hljs-class {
+  color: #8be9fd;
+}
+
+/* Callouts and notes */
+.blog-article .note,
+.blog-article .warning,
+.blog-article .tip {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid;
+}
+
+.blog-article .note {
+  background-color: rgba(66, 153, 225, 0.1);
+  border-left-color: #4299e1;
+}
+
+.blog-article .warning {
+  background-color: rgba(237, 137, 54, 0.1);
+  border-left-color: #ed8936;
+}
+
+.blog-article .tip {
+  background-color: rgba(72, 187, 120, 0.1);
+  border-left-color: #48bb78;
+}
+
+.blog-article .note:before,
+.blog-article .warning:before,
+.blog-article .tip:before {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.blog-article .note:before {
+  content: "Note";
+  color: #4299e1;
+}
+
+.blog-article .warning:before {
+  content: "Warning";
+  color: #ed8936;
+}
+
+.blog-article .tip:before {
+  content: "Tip";
+  color: #48bb78;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .blog-article {
+    font-size: 1rem;
+  }
+
+  .blog-article h1 {
+    font-size: 2rem;
+  }
+
+  .blog-article h2 {
+    font-size: 1.75rem;
+  }
+
+  .blog-article h3 {
+    font-size: 1.4rem;
+  }
+
+  .blog-article pre {
+    padding: 1rem;
+  }
+
+  .blog-article blockquote {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .blog-article code {
+    background-color: rgba(40, 40, 40, 0.8);
+  }
+
+  .blog-article pre {
+    background-color: rgba(25, 25, 25, 0.9);
+  }
+}

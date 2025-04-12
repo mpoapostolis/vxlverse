@@ -6,6 +6,7 @@ import { FaTag, FaTwitter, FaFacebook, FaLinkedin } from "react-icons/fa";
 import useSWR from "swr";
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
+import "../styles/blogArticle.css";
 
 // Fetcher function for the blog post - just one simple function to get a single post by ID
 async function fetchBlogPost(id: string) {
@@ -145,28 +146,8 @@ export function BlogPostPage() {
         )}
 
         {/* Article content */}
-        <article className="mb-16">
-          <div
-            className="prose prose-lg prose-invert max-w-none
-              prose-headings:text-purple-300 
-              prose-h1:text-3xl prose-h1:font-bold prose-h1:mb-6
-              prose-h2:text-2xl prose-h2:font-bold prose-h2:mb-4 prose-h2:mt-8
-              prose-h3:text-xl prose-h3:font-semibold prose-h3:mb-3 prose-h3:mt-6
-              prose-p:mb-4 prose-p:leading-relaxed
-              prose-a:text-purple-400 prose-a:no-underline prose-a:border-b prose-a:border-purple-400/30 hover:prose-a:text-purple-300 hover:prose-a:border-purple-300
-              prose-strong:text-white prose-strong:font-bold
-              prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-purple-300
-              prose-pre:bg-gray-800/80 prose-pre:border prose-pre:border-gray-700 prose-pre:rounded-lg
-              prose-img:rounded-lg prose-img:shadow-lg prose-img:mx-auto
-              prose-ul:list-disc prose-ul:pl-6 prose-li:mb-2
-              prose-ol:list-decimal prose-ol:pl-6
-              prose-blockquote:border-l-4 prose-blockquote:border-purple-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-300
-              prose-hr:border-gray-700
-              prose-table:border-collapse prose-table:w-full
-              prose-th:bg-gray-800 prose-th:p-2 prose-th:text-left prose-th:border prose-th:border-gray-700
-              prose-td:p-2 prose-td:border prose-td:border-gray-700"
-            dangerouslySetInnerHTML={{ __html: post.article }}
-          />
+        <article className="mb-16 blog-article">
+          <div dangerouslySetInnerHTML={{ __html: post.article }} />
         </article>
 
         {/* Author bio card */}
