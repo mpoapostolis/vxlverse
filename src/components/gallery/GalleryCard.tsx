@@ -59,7 +59,7 @@ export function GalleryCard({ gallery }: GalleryCardProps) {
               className="flex items-center gap-1.5 text-gray-400 hover:text-blue-400 transition-colors"
             >
               <User size={14} strokeWidth={1.5} />
-              <span className="font-medium">{gallery.creator.username}</span>
+              <span className="font-medium">{gallery.creator}</span>
             </Link>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5 text-gray-500">

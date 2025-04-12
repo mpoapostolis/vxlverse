@@ -7,12 +7,12 @@ export interface Gallery {
   description: string;
   thumbnail?: string;
   thumbnailUrl?: string;
+  gameConf?: {
+    scenes: unknown[];
+  };
   createdAt: string;
   updated: string;
-  creator: {
-    id: string;
-    username: string;
-  };
+  creator: string;
   paintingCount: number;
   tags: string[];
   isPublic: boolean;
@@ -30,16 +30,15 @@ export function useGalleries() {
       const response = await pb.collection("games").getList(1, 100, {
         filter: 'type = "gallery"',
         sort: "-created",
-        expand: "creator",
+        expand: "owner",
       });
 
       // Transform the response to match our Gallery interface
       const fetchedGalleries = response.items.map((item) => {
         // Get the creator information
-        const creator = item.expand?.creator || { id: item.creator, username: "Unknown" };
 
         // Get the thumbnail URL if it exists
-        const thumbnailUrl = item.thumbnail ? pb.getFileUrl(item, item.thumbnail) : "";
+        const thumbnailUrl = item.thumbnail ? pb.files.getURL(item, item.thumbnail) : "";
 
         // Parse tags if they exist and are stored as a JSON string
         let tags: string[] = [];
@@ -59,11 +58,8 @@ export function useGalleries() {
           thumbnailUrl,
           createdAt: item.created,
           updated: item.updated,
-          creator: {
-            id: creator.id,
-            username: creator.username || "Unknown",
-          },
-          paintingCount: item.paintingCount || 0,
+          creator: item.expand?.owner.email || "Unknown",
+          paintingCount: item.gameConf?.scenes?.at(0)?.objects?.length || 0,
           tags,
           isPublic: item.isPublic,
           type: item.type,
