@@ -194,7 +194,7 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
       <Helmet>
-        <title>XXXX - Create 3D Games & Art Galleries Without Coding</title>
+        <title>VXLVerse - Create 3D Games & Art Galleries Without Coding</title>
         <meta
           name="description"
           content="Create stunning 3D games and art galleries without coding. VXLVerse is the easiest way to build and share interactive 3D experiences."
