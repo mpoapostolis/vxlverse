@@ -15,6 +15,7 @@ export interface Game {
 const fetcher = async () => {
   const records = await pb.collection("games").getFullList<Game>({
     sort: "-created",
+    filter: 'type != "gallery"',
   });
   return records;
 };

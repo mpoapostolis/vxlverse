@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { CreateGameModal } from "../components/game/CreateGameModal";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, Sparkles, Palette, Clock, Flame, X } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 import { useGames } from "../hooks/useGames";
 import { GameFilters } from "../components/game/GameFilters";
@@ -11,11 +11,14 @@ import { Input } from "../components/UI/input";
 import { Footer } from "../components/layout/Footer";
 
 export function Games() {
-  const [activeTab, setActiveTab] = useState<"all" | "my">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "my" | "featured">("all");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<"newest" | "popular" | "updated">("newest");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const { user } = useAuthStore();
   const { games, isLoading, mutate } = useGames();
@@ -42,10 +45,37 @@ export function Games() {
 
     if (activeTab === "my" && user) {
       filtered = filtered.filter((game) => game.creator === user.id);
+    } else if (activeTab === "featured") {
+      // Filter featured games - assuming games have a featured property or using another way to determine featured status
+      filtered = filtered.filter((game) => (game as any).featured === true);
+    }
+
+    // Sort games based on sortBy value
+    if (sortBy === "newest") {
+      // Sort by creation date - using pb's created field or lastUpdated as fallback
+      filtered.sort((a, b) => {
+        const dateA = (a as any).created ? new Date((a as any).created).getTime() : 0;
+        const dateB = (b as any).created ? new Date((b as any).created).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (sortBy === "popular") {
+      // Sort by popularity - using players count or rating as indicators
+      filtered.sort((a, b) => {
+        const likesA = (a as any).likes?.length || a.players || 0;
+        const likesB = (b as any).likes?.length || b.players || 0;
+        return likesB - likesA;
+      });
+    } else if (sortBy === "updated") {
+      // Sort by update date - using lastUpdated field
+      filtered.sort((a, b) => {
+        const dateA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
+        const dateB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
+        return dateB - dateA;
+      });
     }
 
     return filtered;
-  }, [games, search, selectedTags, activeTab, user?.id]);
+  }, [games, search, selectedTags, activeTab, user?.id, sortBy]);
 
   if (isLoading) {
     return (
@@ -92,37 +122,110 @@ export function Games() {
           </div>
 
           {/* Search and Tabs */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search games..."
-                className="w-full h-10 pl-10 pr-4 bg-white/5 border border-white/10  text-white placeholder:text-gray-500 
-                         focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all"
-              />
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
-                strokeWidth={1.5}
-              />
-            </div>
-            <div className="flex gap-2 self-end">
-              <Button
-                size="sm"
-                variant={activeTab === "all" ? "primary" : "outline"}
-                onClick={() => setActiveTab("all")}
+          <div className="flex flex-col sm:flex-row gap-4 animate-fadeIn animation-delay-300 relative z-10">
+            <div className="relative flex-1 group">
+              <div
+                className={`relative transition-all duration-300 ${isSearchFocused ? "scale-[1.02]" : "scale-100"}`}
               >
-                All Games
-              </Button>
+                <Input
+                  ref={searchInputRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                  placeholder="Search by title, description or tags..."
+                  className={`w-full h-12 pl-12 pr-4 bg-white/5 border text-white placeholder:text-gray-500 
+                           focus:outline-none focus:ring-2 transition-all rounded-lg
+                           ${isSearchFocused ? "border-violet-500/50 focus:ring-violet-500/30 shadow-lg shadow-violet-500/10" : "border-white/10 focus:ring-violet-500/10 group-hover:border-white/20"}`}
+                />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6">
+                  <Search
+                    className={`w-5 h-5 transition-colors ${isSearchFocused ? "text-violet-400" : "text-gray-500 group-hover:text-gray-400"}`}
+                    strokeWidth={1.5}
+                  />
+                </div>
+                {search && (
+                  <button
+                    onClick={() => {
+                      setSearch("");
+                      searchInputRef.current?.focus();
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+              {search && (
+                <div className="absolute -bottom-6 left-0 text-xs text-blue-300 flex items-center">
+                  <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
+                  Found {filteredGames.length} {filteredGames.length === 1 ? "result" : "results"}
+                  {(search || selectedTags.length > 0) && (
+                    <button
+                      onClick={() => {
+                        setSearch("");
+                        setSelectedTags([]);
+                      }}
+                      className="ml-3 text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
+                    >
+                      <X size={10} />
+                      <span>Clear</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Sort buttons */}
+            <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1 h-12 shadow-sm shadow-blue-500/5">
+              <button
+                onClick={() => setSortBy("newest")}
+                className={`flex items-center px-3 py-1.5 rounded-md transition-all ${sortBy === "newest" ? "bg-blue-500/20 text-blue-300" : "text-gray-400 hover:bg-white/5"}`}
+              >
+                <Clock size={14} className="mr-1.5" />
+                <span>Newest</span>
+              </button>
+              <button
+                onClick={() => setSortBy("popular")}
+                className={`flex items-center px-3 py-1.5 rounded-md transition-all ${sortBy === "popular" ? "bg-blue-500/20 text-blue-300" : "text-gray-400 hover:bg-white/5"}`}
+              >
+                <Flame size={14} className="mr-1.5" />
+                <span>Popular</span>
+              </button>
+              <button
+                onClick={() => setSortBy("updated")}
+                className={`flex items-center px-3 py-1.5 rounded-md transition-all ${sortBy === "updated" ? "bg-blue-500/20 text-blue-300" : "text-gray-400 hover:bg-white/5"}`}
+              >
+                <Palette size={14} className="mr-1.5" />
+                <span>Updated</span>
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-1 self-end bg-white/5 border border-white/10 rounded-lg p-1 h-12 shadow-sm shadow-blue-500/5">
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`flex items-center px-4 py-1.5 rounded-md transition-all ${activeTab === "all" ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
+              >
+                <span>All</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("featured")}
+                className={`flex items-center px-4 py-1.5 rounded-md transition-all ${activeTab === "featured" ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
+              >
+                <Sparkles size={14} className="mr-1.5" />
+                <span>Featured</span>
+              </button>
+
               {user && (
-                <Button
-                  size="sm"
-                  variant={activeTab === "my" ? "primary" : "outline"}
+                <button
                   onClick={() => setActiveTab("my")}
+                  className={`flex items-center px-4 py-1.5 rounded-md transition-all ${activeTab === "my" ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
                 >
-                  My Games
-                </Button>
+                  <span>My Games</span>
+                </button>
               )}
             </div>
           </div>
