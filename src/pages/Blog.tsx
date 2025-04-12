@@ -2,7 +2,6 @@ import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { pb } from "../lib/pocketbase";
 import { BlogPost as BlogPostType } from "../types/blog";
-import { Spinner } from "../components/ui/Spinner";
 import {
   FaArrowLeft,
   FaCalendarAlt,
@@ -87,7 +86,7 @@ export function Blog() {
   if (isPageLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-gray-900 to-black">
-        <Spinner size="lg" />
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent  animate-spin" />
       </div>
     );
   }

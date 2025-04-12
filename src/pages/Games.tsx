@@ -234,14 +234,26 @@ export function Games() {
         {/* Filters */}
         {isFiltersOpen && (
           <div className="mb-6 p-4 bg-white/5 border border-white/10  backdrop-blur-sm">
-            <GameFilters selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+            <GameFilters
+              selectedTags={selectedTags}
+              onTagsChange={setSelectedTags}
+              onSearchChange={setSearch}
+            />
           </div>
         )}
 
         {/* Games Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredGames.map((game) => (
-            <GameCard key={game.id} game={game} />
+          {filteredGames.map((game, index) => (
+            <GameCard
+              key={game.id}
+              game={{
+                ...game,
+                owner: game.creator, // Map creator to owner
+                updated: game.lastUpdated, // Map lastUpdated to updated
+              }}
+              index={index}
+            />
           ))}
         </div>
 

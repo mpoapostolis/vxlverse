@@ -29,7 +29,7 @@ export function Galleries() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "popular" | "updated">("newest");
-  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -38,13 +38,6 @@ export function Galleries() {
 
   const { user } = useAuthStore();
   const { galleries, isLoading, mutate } = useGalleries();
-
-  // Handle refresh
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await mutate();
-    setTimeout(() => setIsRefreshing(false), 800); // Add a slight delay for better UX
-  };
 
   // Handle clear filters
   const handleClearFilters = useCallback(() => {

@@ -30,7 +30,15 @@ export function Favorites() {
         {favoriteGames.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favoriteGames.map((game, index) => (
-              <GameCard key={game.id} game={game} index={index} />
+              <GameCard
+                key={game.id}
+                game={{
+                  ...game,
+                  owner: game.creator, // Map creator to owner
+                  updated: game.lastUpdated, // Map lastUpdated to updated
+                }}
+                index={index}
+              />
             ))}
           </div>
         ) : (
