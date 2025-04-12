@@ -4,8 +4,13 @@
   "description": "Create immersive 3D games with VXLverse, a powerful browser-based voxel game editor",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#121212",
   "theme_color": "#121212",
+  "categories": ["games", "entertainment", "development"],
+  "scope": "/",
+  "prefer_related_applications": false,
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "icons": [
     {
       "src": "/icons/android/android-launchericon-72-72.png",
