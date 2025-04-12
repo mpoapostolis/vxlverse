@@ -162,6 +162,20 @@ export function Header() {
               >
                 <span>Blog</span>
               </Link>
+              <Link
+                to="/help"
+                className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${
+                  location.pathname === "/help"
+                    ? "text-white bg-gradient-to-r from-blue-600/80 to-violet-600/80 shadow-lg shadow-blue-500/20"
+                    : "text-gray-300 hover:text-white hover:bg-white/5"
+                }`}
+                aria-current={location.pathname === "/help" ? "page" : undefined}
+              >
+                <div className="flex items-center gap-1.5">
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  <span>Help</span>
+                </div>
+              </Link>
             </nav>
 
             <div className="flex items-center">
@@ -336,6 +350,24 @@ export function Header() {
                   aria-current={location.pathname === "/pricing" ? "page" : undefined}
                 >
                   Pricing
+                </Link>
+                <Link
+                  to="/blog"
+                  className={`block px-3 py-2  text-base font-medium ${location.pathname === "/blog" || location.pathname.startsWith("/blog/") ? "bg-blue-600/20 text-white border-l-4 border-blue-500" : "text-gray-300 hover:bg-gray-800 hover:text-white"}`}
+                  aria-current={
+                    location.pathname === "/blog" || location.pathname.startsWith("/blog/")
+                      ? "page"
+                      : undefined
+                  }
+                >
+                  Blog
+                </Link>
+                <Link
+                  to="/help"
+                  className={`block px-3 py-2  text-base font-medium ${location.pathname === "/help" ? "bg-blue-600/20 text-white border-l-4 border-blue-500" : "text-gray-300 hover:bg-gray-800 hover:text-white"}`}
+                  aria-current={location.pathname === "/help" ? "page" : undefined}
+                >
+                  Help
                 </Link>
               </div>
             </motion.div>

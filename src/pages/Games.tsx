@@ -56,10 +56,10 @@ export function Games() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-slate-900 to-black">
       <Header />
 
-      <div className="flex-1 container mx-auto  px-4 sm:px-6 lg:px-8 pt-20 pb-8">
+      <div className="flex-1 container   mx-auto  px-4 sm:px-6 lg:px-8 pt-20 pb-8">
         {/* Header Section */}
         <div className="flex flex-col gap-6 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
