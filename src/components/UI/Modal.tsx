@@ -11,24 +11,15 @@ interface ModalProps {
 export function Modal({ isOpen, onClose, children, title }: ModalProps) {
   return (
     isOpen && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="fixed top-0 left-0 h-screen inset-0 flex items-center justify-center z-50">
         {/* Backdrop with blur */}
         <div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={onClose}
           className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/80 backdrop-blur-sm"
         />
 
         {/* Modal Container with max height and scrolling */}
-        <div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ type: "spring", damping: 20, stiffness: 300 }}
-          className="w-full max-w-2xl mx-4 max-h-[90vh] relative"
-        >
+        <div className="w-full max-w-2xl mx-4 max-h-[90vh] relative">
           {/* Glass background with gradient borders */}
           <div className="relative  overflow-hidden bg-gradient-to-br p-[1px] from-white/20 via-white/0 to-white/20">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-violet-500/10 to-purple-500/10 animate-gradient" />
