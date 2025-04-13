@@ -34,7 +34,6 @@ export function ArtEditor({ transformMode = "translate" }: EditorSceneProps = {}
     brushActive,
   } = useEditorStore();
   const setSelectedObjectId = useEditorStore((state) => state.setSelectedObject);
-
   // References
   const selectedPaintingRef = useRef<THREE.Group | null>(null);
   // Handle object selection and transformation
@@ -96,27 +95,32 @@ export function ArtEditor({ transformMode = "translate" }: EditorSceneProps = {}
 
       {/* Render all paintings from the store */}
       {objects
-        ?.filter((obj) => obj.type === "painting")
-        ?.map((painting) => (
-          <Suspense>
-            <Painting
-              key={painting.id}
-              imageUrl={painting.imageUrl ?? ""}
-              position={painting.position}
-              rotation={painting.rotation}
-              scale={painting.scale}
-              width={1}
-              height={1}
-              isSelected={painting.id === selectedObjectId}
-              onClick={() => setSelectedObject(painting.id)}
-              ref={
-                painting.id === selectedObjectId
-                  ? (selectedPaintingRef as React.RefObject<THREE.Group>)
-                  : undefined
-              }
-            />
-          </Suspense>
-        ))}
+        // ?.filter((obj) => obj.type === "painting")
+        ?.map((painting) => {
+          return (
+            <Suspense key={painting.id}>
+              <Painting
+                imageUrl={painting?.imageUrl ?? ""}
+                position={
+                  new THREE.Vector3(painting.position.x, painting.position.y, painting.position.z)
+                }
+                rotation={
+                  new THREE.Euler(painting.rotation.x, painting.rotation.y, painting.rotation.z)
+                }
+                scale={new THREE.Vector3(painting.scale.x, painting.scale.y, painting.scale.z)}
+                width={1}
+                height={1}
+                isSelected={painting.id === selectedObjectId}
+                onClick={() => !brushActive && setSelectedObject(painting.id)}
+                ref={
+                  painting.id === selectedObjectId
+                    ? (selectedPaintingRef as React.RefObject<THREE.Group>)
+                    : undefined
+                }
+              />
+            </Suspense>
+          );
+        })}
 
       {/* Box Colliders */}
       {objects

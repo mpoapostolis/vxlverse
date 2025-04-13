@@ -4,9 +4,9 @@ import { useTexture } from "@react-three/drei";
 
 interface PaintingProps {
   imageUrl: string;
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  scale?: [number, number, number];
+  position: THREE.Vector3;
+  rotation?: THREE.Euler;
+  scale?: THREE.Vector3;
   width?: number;
   height?: number;
   isSelected?: boolean;
@@ -18,8 +18,8 @@ export const Painting = forwardRef<THREE.Group, PaintingProps>(
     {
       imageUrl,
       position,
-      rotation = [0, 0, 0],
-      scale = [1, 1, 1],
+      rotation = new THREE.Euler(0, 0, 0),
+      scale = new THREE.Vector3(1, 1, 1),
       width = 10,
       height = 10,
       isSelected = false,

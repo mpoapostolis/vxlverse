@@ -10,6 +10,8 @@ import { ContentModerationAlert } from "../components/legal/ContentModerationAle
 import { Toolbar } from "../components/editor/Toolbar";
 import { KEYBOARD_MAP } from "./Editor";
 import { useEditorStore } from "../stores/editorStore";
+import * as THREE from "three";
+import gsap from "gsap";
 
 export function ArtGallery() {
   const { createNewScene } = useEditorStore();
@@ -34,53 +36,78 @@ export function _ArtGallery() {
   const [moderationMessage] = useState("");
   const orbitControlsRef = useRef<any>(null);
 
-  // Get the selected object from the editor store
+  // Get selected object from store
   const { selectedObjectId, scenes, currentSceneId } = useEditorStore();
-  const currentScene = scenes.find((scene) => scene.id === currentSceneId);
 
-  // Handle keyboard controls
+  // Effect to handle keyboard shortcuts
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Focus on painting when F key is pressed
-      if (e.code === "KeyF") {
-        focusOnSelectedPainting();
+    // Function to focus on selected object with smooth animation
+    const focusOnSelectedObject = () => {
+      if (!selectedObjectId || !orbitControlsRef.current || !currentSceneId) return;
+
+      // Find the selected object in the current scene
+      const currentScene = scenes.find((scene) => scene.id === currentSceneId);
+      if (!currentScene) return;
+
+      const selectedObject = currentScene.objects.find((obj) => obj.id === selectedObjectId);
+      if (!selectedObject) return;
+
+      // Create a target position from the selected object's position
+      const targetPosition = new THREE.Vector3(
+        selectedObject.position.x,
+        selectedObject.position.y,
+        selectedObject.position.z
+      );
+
+      // Use GSAP to smoothly animate the camera target
+      gsap.to(orbitControlsRef.current.target, {
+        x: targetPosition.x,
+        y: targetPosition.y,
+        z: targetPosition.z,
+        duration: 0.8,
+        ease: "power3.out",
+        onUpdate: () => orbitControlsRef.current.update(),
+      });
+
+      // Animate camera position to move back for a better view
+      const cameraPosition = orbitControlsRef.current.object.position.clone();
+      const direction = cameraPosition.clone().sub(targetPosition).normalize();
+
+      // Increase the distance multiplier to position the camera further back
+      // Use a fixed minimum distance to ensure we're always far enough back
+      const objectSize = Math.max(
+        selectedObject.scale.x,
+        selectedObject.scale.y,
+        selectedObject.scale.z
+      );
+      const distance = Math.max(objectSize * 10, 15); // Ensure minimum distance of 15 units
+
+      // Calculate new position by moving in the direction away from target
+      const newPosition = targetPosition.clone().add(direction.multiplyScalar(distance));
+
+      gsap.to(orbitControlsRef.current.object.position, {
+        x: newPosition.x,
+        y: newPosition.y,
+        z: newPosition.z,
+        duration: 1.2, // Slightly longer duration for smoother movement
+        ease: "power2.inOut",
+        onUpdate: () => orbitControlsRef.current.update(),
+      });
+    };
+
+    // Check for F key press
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "KeyF") {
+        focusOnSelectedObject();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedObjectId, currentScene]);
 
-  // Function to focus camera on the selected painting
-  const focusOnSelectedPainting = () => {
-    if (!selectedObjectId || !currentScene || !orbitControlsRef.current) return;
-
-    const selectedObject = currentScene.objects.find((obj) => obj.id === selectedObjectId);
-
-    // Only focus if it's a painting
-    if (selectedObject && (selectedObject.type === "painting" || selectedObject.imageUrl)) {
-      const { position } = selectedObject;
-
-      // Set orbit controls target to the painting position
-      orbitControlsRef.current.target.set(position.x, position.y, position.z);
-
-      // Position camera to face the painting from a good viewing distance
-      const cameraDistance = 15; // Adjust this value as needed
-      const cameraHeight = position.y + 10.5; // Position camera slightly above the painting center
-
-      // Calculate camera position based on painting rotation
-      const { rotation } = selectedObject;
-      const angle = rotation.y || 0;
-
-      // Position camera in front of the painting based on its rotation
-      const cameraX = position.x - Math.sin(angle) * cameraDistance;
-      const cameraZ = position.z - Math.cos(angle) * cameraDistance;
-
-      // Animate camera to new position
-      orbitControlsRef.current.object.position.set(cameraX, cameraHeight, cameraZ);
-      orbitControlsRef.current.update();
-    }
-  };
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedObjectId, scenes, currentSceneId]);
 
   return (
     <div className="flex flex-col w-full h-screen bg-slate-900">

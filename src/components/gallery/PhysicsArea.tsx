@@ -98,17 +98,41 @@ export function PhysicsArea() {
     if (!brushActive) return;
 
     const id = new THREE.Object3D().uuid;
+
+    // Create plain JavaScript objects with x, y, z properties
+    // This ensures we're not passing references to THREE objects
+    const position = {
+      x: paintingRef.current.position.x,
+      y: paintingRef.current.position.y,
+      z: paintingRef.current.position.z,
+    };
+
+    const rotation = {
+      x: paintingRef.current.rotation.x,
+      y: paintingRef.current.rotation.y,
+      z: paintingRef.current.rotation.z,
+    };
+
+    const scale = {
+      x: 1,
+      y: 1,
+      z: 1,
+    };
+
     const newPainting = {
       id,
       type: "painting",
-      position: paintingRef.current?.position,
-      rotation: paintingRef.current?.rotation,
-      scale: paintingRef.current?.scale,
-      name: `Painting  placeholder`,
+      position,
+      rotation,
+      scale,
+      name: `Painting placeholder`,
       imageUrl: "/textures/canvas.png",
     } as GameObject;
+
     if (!currentSceneId) return;
     addObject(currentSceneId, newPainting);
+
+    console.log("Added new painting:", newPainting);
   };
 
   return (

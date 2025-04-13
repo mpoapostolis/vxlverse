@@ -25,6 +25,7 @@
     "date-fns": "^4.1.0",
     "ecctrl": "^1.0.92",
     "framer-motion": "^12.6.3",
+    "gsap": "^3.12.7",
     "howler": "^2.2.4",
     "jotai": "^2.12.2",
     "lucide-react": "^0.487.0",
