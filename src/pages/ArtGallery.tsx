@@ -69,21 +69,32 @@ export function _ArtGallery() {
         onUpdate: () => orbitControlsRef.current.update(),
       });
 
-      // Animate camera position to move back for a better view
-      const cameraPosition = orbitControlsRef.current.object.position.clone();
-      const direction = cameraPosition.clone().sub(targetPosition).normalize();
+      // Always position camera to view the front of the object (paintings)
+      // For paintings in a gallery, we want to position the camera in front of them
 
-      // Increase the distance multiplier to position the camera further back
-      // Use a fixed minimum distance to ensure we're always far enough back
+      // Create a direction vector pointing to the front of the object
+      // In the art gallery, paintings typically have their front facing the negative Z direction
+      // So we need to use a negative Z vector to position the camera in front
+      const frontDirection = new THREE.Vector3(0, 0, -1); // Negative Z is front for paintings
+
+      // Apply the object's rotation to get the correct front direction in world space
+      const objectRotation = new THREE.Euler(
+        selectedObject.rotation.x,
+        selectedObject.rotation.y,
+        selectedObject.rotation.z
+      );
+      frontDirection.applyEuler(objectRotation);
+
+      // Calculate the size of the object for appropriate distance
       const objectSize = Math.max(
         selectedObject.scale.x,
         selectedObject.scale.y,
         selectedObject.scale.z
       );
-      const distance = Math.max(objectSize * 10, 15); // Ensure minimum distance of 15 units
+      const distance = Math.max(objectSize * 8, 12); // Distance to view from
 
-      // Calculate new position by moving in the direction away from target
-      const newPosition = targetPosition.clone().add(direction.multiplyScalar(distance));
+      // Position camera in front of the object
+      const newPosition = targetPosition.clone().add(frontDirection.multiplyScalar(distance));
 
       gsap.to(orbitControlsRef.current.object.position, {
         x: newPosition.x,
