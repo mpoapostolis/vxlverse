@@ -7,9 +7,14 @@
 :root {
   color-scheme: dark;
 }
-
+header {
+  padding-top: constant(safe-area-inset-top); /* για παλιότερα iPhones */
+  padding-top: env(safe-area-inset-top); /* για καινούρια */
+}
 body {
   margin: 0;
+  padding-top: calc(60px + env(safe-area-inset-top));
+
   font-family:
     system-ui,
     -apple-system,
