@@ -91,7 +91,8 @@ export function _ArtGallery() {
         selectedObject.scale.y,
         selectedObject.scale.z
       );
-      const distance = Math.max(objectSize * 8, 12); // Distance to view from
+      // Increased distance multiplier and minimum distance for a farther view
+      const distance = Math.max(objectSize * 15, 20); // Significantly increased distance
 
       // Position camera in front of the object
       const newPosition = targetPosition.clone().add(frontDirection.multiplyScalar(distance));
