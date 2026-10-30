@@ -4,6 +4,8 @@
 
 ### _Create, Play, Share: The Ultimate 3D Game & Art Gallery Platform_
 
+> The live VXLVERSE is at **[vxlverse.com](https://vxlverse.com)**: make a 3D story game in your browser in about 10 minutes. This repo is the earlier open-source version.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Built with: React](https://img.shields.io/badge/Built%20with-React-61DAFB.svg)](https://reactjs.org/)
 [![3D Engine: Three.js](https://img.shields.io/badge/3D%20Engine-Three.js-black.svg)](https://threejs.org/)
